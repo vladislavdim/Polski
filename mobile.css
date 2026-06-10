@@ -1,0 +1,37 @@
+@media(max-width:600px){
+  /* tabs */
+  nav { padding:10px 8px 0; gap:2px; }
+  .tab { padding:7px 11px; font-size:.75rem; }
+
+  /* header */
+  header { padding:14px 14px 12px; gap:10px; }
+  header h1 { font-size:1.1rem; }
+  .header-right { font-size:.75rem; }
+
+  /* stat chips — 4 в ряд */
+  .stat-row { gap:6px; }
+  .stat-chip { min-width:0; padding:8px 6px; }
+  .stat-chip .val { font-size:1.1rem; }
+  .stat-chip .lbl { font-size:.6rem; }
+
+  /* search row */
+  .search-row { flex-wrap:nowrap; gap:6px; }
+  .search-row input { min-width:0; font-size:.78rem; }
+  .search-row select { font-size:.78rem; padding:8px 6px; }
+
+  /* vocab */
+  .vocab-row { grid-template-columns:1fr 1fr; }
+  .vocab-row .cat, .vocab-row .lvl { display:none; }
+  .vocab-header { display:none; }
+
+  /* quiz */
+  .quiz-opts { grid-template-columns:1fr; }
+
+  /* flashcard */
+  .fc-pl { font-size:1.5rem; }
+  .fc-ru { font-size:1.2rem; }
+
+  /* padding */
+  main { padding:0 10px 40px; }
+  .card { padding:14px; }
+}
