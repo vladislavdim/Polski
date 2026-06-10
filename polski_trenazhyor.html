@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polski B2/C1 — Тренажёр</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --card: #1e1e28;
+    --border: #2a2a38;
+    --accent: #c084fc;
+    --accent2: #818cf8;
+    --accent3: #34d399;
+    --warn: #fb923c;
+    --red: #f87171;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --light: #a0a0b8;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh; }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #1a0a2e 0%, #0f0f13 60%);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 24px 16px;
+    position: sticky; top:0; z-index:100;
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  header h1 { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:800; color:#fff; }
+  header h1 span { color:var(--accent); }
+  .badge { background:var(--accent); color:#fff; font-size:.65rem; font-weight:700; padding:2px 8px; border-radius:20px; letter-spacing:.04em; }
+  .header-right { margin-left:auto; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  #xpBar { font-size:.8rem; color:var(--accent3); font-weight:600; }
+
+  /* ── NAV TABS ── */
+  nav { display:flex; gap:4px; padding:14px 16px 0; overflow-x:auto; }
+  .tab {
+    padding:8px 16px; border-radius:8px 8px 0 0; border:none; cursor:pointer;
+    font-family:'Inter',sans-serif; font-size:.82rem; font-weight:500;
+    background:var(--surface); color:var(--muted); transition:all .2s;
+    white-space:nowrap; border:1px solid transparent; border-bottom:none;
+  }
+  .tab:hover { color:var(--text); background:var(--card); }
+  .tab.active { background:var(--card); color:#fff; border-color:var(--border); }
+
+  /* ── MAIN CONTAINER ── */
+  main { padding:0 16px 40px; max-width:900px; margin:0 auto; }
+  .section { display:none; }
+  .section.active { display:block; animation:fadeIn .25s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ── CARDS ── */
+  .card {
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:20px; margin-top:16px;
+  }
+  .card-title { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; margin-bottom:12px; color:#fff; }
+  .card-title .ico { margin-right:8px; }
+
+  /* ── FLASHCARD DRILL ── */
+  .flashcard-wrap { perspective:1000px; margin:20px auto; max-width:520px; }
+  .flashcard {
+    width:100%; height:200px; border-radius:18px; cursor:pointer;
+    position:relative; transform-style:preserve-3d; transition:transform .5s ease;
+    user-select:none;
+  }
+  .flashcard.flipped { transform:rotateY(180deg); }
+  .fc-front, .fc-back {
+    position:absolute; inset:0; border-radius:18px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    backface-visibility:hidden; padding:24px;
+  }
+  .fc-front {
+    background: linear-gradient(135deg, #2d1b4e, #1e1e40);
+    border:1px solid var(--accent);
+  }
+  .fc-back {
+    background: linear-gradient(135deg, #0d2b2b, #1e1e40);
+    border:1px solid var(--accent3);
+    transform:rotateY(180deg);
+  }
+  .fc-pl { font-size:2rem; font-weight:700; color:var(--accent); }
+  .fc-ru { font-size:1.5rem; font-weight:600; color:var(--accent3); }
+  .fc-hint { font-size:.78rem; color:var(--muted); margin-top:8px; }
+  .fc-tag { font-size:.72rem; background:rgba(192,132,252,.15); color:var(--accent); padding:3px 10px; border-radius:20px; margin-bottom:12px; }
+  .fc-controls { display:flex; gap:10px; justify-content:center; margin-top:14px; flex-wrap:wrap; }
+  .btn {
+    padding:9px 20px; border-radius:10px; border:none; cursor:pointer;
+    font-family:'Inter',sans-serif; font-size:.82rem; font-weight:600;
+    transition:all .15s;
+  }
+  .btn-green { background:var(--accent3); color:#0f0f13; }
+  .btn-green:hover { filter:brightness(1.1); }
+  .btn-red { background:var(--red); color:#0f0f13; }
+  .btn-red:hover { filter:brightness(1.1); }
+  .btn-purple { background:var(--accent); color:#fff; }
+  .btn-purple:hover { filter:brightness(1.1); }
+  .btn-gray { background:var(--border); color:var(--text); }
+  .btn-gray:hover { background:#363648; }
+  .btn-orange { background:var(--warn); color:#0f0f13; }
+
+  .drill-stats { display:flex; gap:16px; justify-content:center; font-size:.8rem; color:var(--light); margin-top:8px; }
+  .drill-stats span strong { color:#fff; }
+
+  /* progress bar */
+  .progress-bar { height:5px; background:var(--border); border-radius:3px; margin:12px 0 4px; overflow:hidden; }
+  .progress-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,var(--accent),var(--accent2)); transition:width .4s; }
+
+  /* ── VOCAB TABLE ── */
+  .search-row { display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+  .search-row input, .search-row select {
+    background:var(--surface); border:1px solid var(--border); color:var(--text);
+    border-radius:8px; padding:8px 12px; font-size:.82rem; font-family:'Inter',sans-serif;
+  }
+  .search-row input { flex:1; min-width:160px; }
+  .search-row input:focus, .search-row select:focus { outline:none; border-color:var(--accent); }
+
+  .vocab-grid { display:grid; gap:6px; }
+  .vocab-row {
+    display:grid; grid-template-columns:1fr 1fr .8fr .6fr;
+    gap:10px; padding:10px 14px; background:var(--surface); border-radius:10px;
+    border:1px solid transparent; transition:border .15s; align-items:center; font-size:.83rem;
+  }
+  .vocab-row:hover { border-color:var(--border); }
+  .vocab-row .pl { color:#fff; font-weight:600; }
+  .vocab-row .ru { color:var(--light); }
+  .vocab-row .cat { font-size:.7rem; background:var(--border); padding:2px 8px; border-radius:12px; color:var(--muted); text-align:center; }
+  .vocab-row .lvl { font-size:.72rem; text-align:center; font-weight:700; }
+  .lvl-b2 { color:var(--accent2); }
+  .lvl-c1 { color:var(--accent); }
+  .lvl-slang { color:var(--warn); }
+
+  .vocab-header { display:grid; grid-template-columns:1fr 1fr .8fr .6fr; gap:10px; padding:6px 14px; font-size:.72rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+
+  .pagination { display:flex; gap:8px; justify-content:center; margin-top:16px; align-items:center; font-size:.82rem; color:var(--light); }
+  .pagination button { background:var(--surface); border:1px solid var(--border); color:var(--text); padding:5px 12px; border-radius:7px; cursor:pointer; font-size:.8rem; }
+  .pagination button:hover { background:var(--card); }
+  .pagination button.cur { background:var(--accent); border-color:var(--accent); color:#fff; }
+
+  /* ── RULES ── */
+  .rule-item { margin-bottom:12px; border-radius:12px; overflow:hidden; }
+  .rule-head {
+    background:var(--surface); padding:12px 16px; cursor:pointer;
+    display:flex; justify-content:space-between; align-items:center;
+    font-weight:600; font-size:.88rem; border:1px solid var(--border);
+    border-radius:12px; transition:background .15s;
+  }
+  .rule-head:hover { background:#222230; }
+  .rule-head .arrow { transition:transform .25s; color:var(--muted); }
+  .rule-head.open .arrow { transform:rotate(180deg); }
+  .rule-body {
+    display:none; padding:16px; background:var(--card);
+    border:1px solid var(--border); border-top:none;
+    border-radius:0 0 12px 12px; font-size:.85rem; line-height:1.7;
+  }
+  .rule-body.show { display:block; animation:fadeIn .2s ease; }
+  .rule-body table { width:100%; border-collapse:collapse; margin:10px 0; font-size:.82rem; }
+  .rule-body th { background:var(--surface); padding:6px 10px; text-align:left; color:var(--accent); font-size:.75rem; text-transform:uppercase; letter-spacing:.04em; }
+  .rule-body td { padding:6px 10px; border-bottom:1px solid var(--border); }
+  .rule-body td:first-child { color:#fff; font-weight:500; }
+  .hl { color:var(--accent); font-weight:700; }
+  .hl2 { color:var(--accent3); font-weight:700; }
+  .hl3 { color:var(--warn); font-weight:700; }
+  .example { background:rgba(192,132,252,.08); border-left:3px solid var(--accent); padding:8px 12px; margin:8px 0; border-radius:0 8px 8px 0; font-size:.84rem; }
+  .example .pl { color:var(--accent); }
+  .example .tr { color:var(--light); font-size:.78rem; margin-top:2px; }
+
+  /* ── LIFEHACKS ── */
+  .hack-list { display:grid; gap:12px; }
+  .hack {
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:16px; display:flex; gap:14px;
+  }
+  .hack-ico { font-size:1.8rem; flex-shrink:0; }
+  .hack-title { font-weight:700; color:#fff; margin-bottom:4px; font-size:.9rem; }
+  .hack-text { font-size:.83rem; color:var(--light); line-height:1.65; }
+  .hack-example { margin-top:8px; font-size:.8rem; background:rgba(52,211,153,.08); border-left:3px solid var(--accent3); padding:6px 10px; border-radius:0 6px 6px 0; }
+  .hack-example .pl { color:var(--accent3); }
+  .hack-example .tr { color:var(--muted); }
+
+  /* ── QUIZ ── */
+  .quiz-q { font-size:1.3rem; font-weight:700; text-align:center; padding:20px; color:#fff; min-height:80px; display:flex; align-items:center; justify-content:center; }
+  .quiz-opts { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0; }
+  .quiz-opt {
+    background:var(--surface); border:2px solid var(--border); border-radius:12px;
+    padding:14px; cursor:pointer; font-size:.88rem; font-weight:500;
+    transition:all .15s; text-align:center;
+  }
+  .quiz-opt:hover { border-color:var(--accent); color:#fff; }
+  .quiz-opt.correct { border-color:var(--accent3)!important; background:rgba(52,211,153,.12)!important; color:var(--accent3)!important; }
+  .quiz-opt.wrong { border-color:var(--red)!important; background:rgba(248,113,113,.12)!important; color:var(--red)!important; }
+  .quiz-meta { text-align:center; font-size:.8rem; color:var(--muted); margin-bottom:8px; }
+  .quiz-score { text-align:center; font-size:1.1rem; font-weight:700; margin:16px 0; }
+
+  /* ── STAT CHIPS ── */
+  .stat-row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+  .stat-chip { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:10px 16px; flex:1; min-width:100px; text-align:center; }
+  .stat-chip .val { font-size:1.5rem; font-weight:700; color:var(--accent); }
+  .stat-chip .lbl { font-size:.7rem; color:var(--muted); margin-top:2px; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width:6px; height:6px; }
+  ::-webkit-scrollbar-track { background:var(--bg); }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+
+  @media(max-width:600px){
+    .vocab-row { grid-template-columns:1fr 1fr; }
+    .vocab-row .cat, .vocab-row .lvl { display:none; }
+    .vocab-header { display:none; }
+    .quiz-opts { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🇵🇱 <span>Polski</span> B2/C1</h1>
+  <span class="badge">2500+ слов</span>
+  <div class="header-right">
+    <span id="xpBar">⚡ XP: <strong id="xpVal">0</strong></span>
+    <span style="font-size:.8rem;color:var(--muted)">🔥 <span id="streak">0</span> подряд</span>
+  </div>
+</header>
+
+<nav>
+  <button class="tab active" onclick="showTab('vocab')">📚 Словарь</button>
+  <button class="tab" onclick="showTab('drill')">🃏 Карточки</button>
+  <button class="tab" onclick="showTab('quiz')">🎯 Тест</button>
+  <button class="tab" onclick="showTab('rules')">📐 Грамматика</button>
+  <button class="tab" onclick="showTab('hacks')">💡 Лайфхаки</button>
+  <button class="tab" onclick="showTab('slang')">🔥 Сленг</button>
+</nav>
+
+<main>
+
+<!-- ══ СЛОВАРЬ ══ -->
+<div id="vocab" class="section active">
+  <div class="card" style="margin-top:12px">
+    <div class="stat-row">
+      <div class="stat-chip"><div class="val" id="totalWords">0</div><div class="lbl">всего слов</div></div>
+      <div class="stat-chip"><div class="val" style="color:var(--accent2)">B2</div><div class="lbl">средний уровень</div></div>
+      <div class="stat-chip"><div class="val" style="color:var(--accent)">C1</div><div class="lbl">продвинутый</div></div>
+      <div class="stat-chip"><div class="val" style="color:var(--warn)">СЛ</div><div class="lbl">сленг</div></div>
+    </div>
+    <div class="search-row">
+      <input type="text" id="searchInput" placeholder="🔍 поиск по-польски или по-русски…" oninput="renderVocab()">
+      <select id="catFilter" onchange="renderVocab()">
+        <option value="">Все темы</option>
+        <option>работа</option><option>эмоции</option><option>общение</option>
+        <option>время</option><option>еда</option><option>транспорт</option>
+        <option>тело</option><option>природа</option><option>деньги</option>
+        <option>учёба</option><option>политика</option><option>технологии</option>
+        <option>глаголы</option><option>прилагательные</option><option>наречия</option>
+        <option>частицы</option><option>фразы</option>
+      </select>
+      <select id="lvlFilter" onchange="renderVocab()">
+        <option value="">Все уровни</option>
+        <option value="B2">B2</option>
+        <option value="C1">C1</option>
+        <option value="slang">Сленг</option>
+      </select>
+    </div>
+    <div class="vocab-header">
+      <span>Польский</span><span>Русский</span><span>Тема</span><span>Уровень</span>
+    </div>
+    <div class="vocab-grid" id="vocabGrid"></div>
+    <div class="pagination" id="pagination"></div>
+  </div>
+</div>
+
+<!-- ══ КАРТОЧКИ ══ -->
+<div id="drill" class="section">
+  <div class="card">
+    <div class="card-title"><span class="ico">🃏</span>Карточки — спейсд-репетишн</div>
+    <div class="search-row" style="margin-bottom:0">
+      <select id="drillCat" onchange="initDrill()">
+        <option value="">Все темы</option>
+        <option>работа</option><option>эмоции</option><option>общение</option>
+        <option>глаголы</option><option>прилагательные</option><option>наречия</option>
+        <option>фразы</option>
+      </select>
+      <select id="drillLvl" onchange="initDrill()">
+        <option value="">Все уровни</option>
+        <option value="B2">B2</option><option value="C1">C1</option><option value="slang">Сленг</option>
+      </select>
+      <button class="btn btn-gray" onclick="initDrill()">↺ Перемешать</button>
+    </div>
+  </div>
+
+  <div class="flashcard-wrap">
+    <div class="flashcard" id="flashcard" onclick="flipCard()">
+      <div class="fc-front">
+        <div class="fc-tag" id="fc_tag">загрузка…</div>
+        <div class="fc-pl" id="fc_pl">—</div>
+        <div class="fc-hint">нажми чтобы перевернуть</div>
+      </div>
+      <div class="fc-back">
+        <div class="fc-tag" id="fc_tag2"></div>
+        <div class="fc-ru" id="fc_ru">—</div>
+        <div class="fc-hint" id="fc_example" style="color:var(--light);text-align:center;font-size:.85rem"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="drillProgress" style="width:0%"></div></div>
+  <div class="drill-stats">
+    <span>✅ <strong id="drillOk">0</strong></span>
+    <span>❌ <strong id="drillFail">0</strong></span>
+    <span>📦 <strong id="drillLeft">0</strong> осталось</span>
+  </div>
+
+  <div class="fc-controls">
+    <button class="btn btn-red" onclick="rateCard(false)">❌ Не знаю</button>
+    <button class="btn btn-gray" onclick="flipCard()">↩ Перевернуть</button>
+    <button class="btn btn-green" onclick="rateCard(true)">✅ Знаю</button>
+  </div>
+</div>
+
+<!-- ══ ТЕСТ ══ -->
+<div id="quiz" class="section">
+  <div class="card">
+    <div class="card-title"><span class="ico">🎯</span>Тест: выбери правильный перевод</div>
+    <div class="quiz-meta" id="quizMeta">Вопрос 1 из 20</div>
+    <div class="progress-bar"><div class="progress-fill" id="quizProgress" style="width:5%"></div></div>
+    <div class="quiz-q" id="quizQ">Загрузка…</div>
+    <div class="quiz-opts" id="quizOpts"></div>
+    <div class="quiz-score" id="quizScore" style="display:none"></div>
+    <div style="text-align:center;margin-top:10px">
+      <button class="btn btn-purple" onclick="startQuiz()" id="quizRestartBtn" style="display:none">🔄 Новый тест</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ГРАММАТИКА ══ -->
+<div id="rules" class="section">
+  <div class="card">
+    <div class="card-title"><span class="ico">📐</span>Грамматические правила B2–C1</div>
+    <div id="rulesContainer"></div>
+  </div>
+</div>
+
+<!-- ══ ЛАЙФХАКИ ══ -->
+<div id="hacks" class="section">
+  <div class="card">
+    <div class="card-title"><span class="ico">💡</span>Лайфхаки: если забыл слово или правило</div>
+    <div class="hack-list" id="hacksList"></div>
+  </div>
+</div>
+
+<!-- ══ СЛЕНГ ══ -->
+<div id="slang" class="section">
+  <div class="card">
+    <div class="card-title"><span class="ico">🔥</span>Сленг и разговорные выражения</div>
+    <div class="vocab-grid" id="slangGrid"></div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ══════════════════════════════════════════
+//  ДАННЫЕ: 2500+ слов (B2/C1 + сленг)
+// ══════════════════════════════════════════
+const VOCAB = [
+// РАБОТА
+["praca","\u0440\u0430\u0431\u043e\u0442\u0430","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["pracodawca","\u0440\u0430\u0431\u043e\u0442\u043e\u0434\u0430\u0442\u0435\u043b\u044c","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["pracownik","\u0441\u043e\u0442\u0440\u0443\u0434\u043d\u0438\u043a","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["wynagrodzenie","\u0437\u0430\u0440\u0430\u0431\u043e\u0442\u043d\u0430\u044f \u043f\u043b\u0430\u0442\u0430","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["podwyżka","\u043f\u043e\u0432\u044b\u0448\u0435\u043d\u0438\u0435 \u0437\u0430\u0440\u043f\u043b\u0430\u0442\u044b","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["awans","\u043f\u0440\u043e\u0434\u0432\u0438\u0436\u0435\u043d\u0438\u0435 \u043f\u043e \u0441\u043b\u0443\u0436\u0431\u0435","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["zwolnienie","\u0443\u0432\u043e\u043b\u044c\u043d\u0435\u043d\u0438\u0435","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["urlop","\u043e\u0442\u043f\u0443\u0441\u043a","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["obowiązki","\u043e\u0431\u044f\u0437\u0430\u043d\u043d\u043e\u0441\u0442\u0438","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["umowa o pracę","\u0442\u0440\u0443\u0434\u043e\u0432\u043e\u0439 \u0434\u043e\u0433\u043e\u0432\u043e\u0440","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["kandydat","\u043a\u0430\u043d\u0434\u0438\u0434\u0430\u0442","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["rekrutacja","\u0440\u0435\u043a\u0440\u0443\u0442\u0438\u043d\u0433","\u0440\u0430\u0431\u043e\u0442\u0430","C1"],
+["wdrożenie","\u0432\u043d\u0435\u0434\u0440\u0435\u043d\u0438\u0435/\u043e\u043d\u0431\u043e\u0440\u0434\u0438\u043d\u0433","\u0440\u0430\u0431\u043e\u0442\u0430","C1"],
+["zebranie","\u0441\u043e\u0432\u0435\u0449\u0430\u043d\u0438\u0435","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["termin","\u0434\u0435\u0434\u043b\u0430\u0439\u043d/\u0441\u0440\u043e\u043a","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["projekt","\u043f\u0440\u043e\u0435\u043a\u0442","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["budżet","\u0431\u044e\u0434\u0436\u0435\u0442","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["doświadczenie zawodowe","\u043e\u043f\u044b\u0442 \u0440\u0430\u0431\u043e\u0442\u044b","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["kwalifikacje","\u043a\u0432\u0430\u043b\u0438\u0444\u0438\u043a\u0430\u0446\u0438\u0438","\u0440\u0430\u0431\u043e\u0442\u0430","C1"],
+["negocjacje","\u043f\u0435\u0440\u0435\u0433\u043e\u0432\u043e\u0440\u044b","\u0440\u0430\u0431\u043e\u0442\u0430","C1"],
+["delegacja","\u043a\u043e\u043c\u0430\u043d\u0434\u0438\u0440\u043e\u0432\u043a\u0430","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["kontrakt","\u043a\u043e\u043d\u0442\u0440\u0430\u043a\u0442","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["firma","\u043a\u043e\u043c\u043f\u0430\u043d\u0438\u044f/\u0444\u0438\u0440\u043c\u0430","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["korporacja","\u043a\u043e\u0440\u043f\u043e\u0440\u0430\u0446\u0438\u044f","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["startup","\u0441\u0442\u0430\u0440\u0442\u0430\u043f","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["branża","\u043e\u0442\u0440\u0430\u0441\u043b\u044c","\u0440\u0430\u0431\u043e\u0442\u0430","C1"],
+["rynek pracy","\u0440\u044b\u043d\u043e\u043a \u0442\u0440\u0443\u0434\u0430","\u0440\u0430\u0431\u043e\u0442\u0430","C1"],
+["bezrobocie","\u0431\u0435\u0437\u0440\u0430\u0431\u043e\u0442\u0438\u0446\u0430","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["samozatrudnienie","\u0441\u0430\u043c\u043e\u0437\u0430\u043d\u044f\u0442\u043e\u0441\u0442\u044c","\u0440\u0430\u0431\u043e\u0442\u0430","C1"],
+["nadgodziny","\u0441\u0432\u0435\u0440\u0445\u0443\u0440\u043e\u0447\u043d\u044b\u0435","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["kierownik","\u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440/\u0440\u0443\u043a\u043e\u0432\u043e\u0434\u0438\u0442\u0435\u043b\u044c","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["dyrektor","\u0434\u0438\u0440\u0435\u043a\u0442\u043e\u0440","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["prezes","\u043f\u0440\u0435\u0437\u0438\u0434\u0435\u043d\u0442 \u043a\u043e\u043c\u043f\u0430\u043d\u0438\u0438/CEO","\u0440\u0430\u0431\u043e\u0442\u0430","C1"],
+["sekretarka","\u0441\u0435\u043a\u0440\u0435\u0442\u0430\u0440\u044c (\u0436.)","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["asystent","\u0430\u0441\u0441\u0438\u0441\u0442\u0435\u043d\u0442","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["specjalista","\u0441\u043f\u0435\u0446\u0438\u0430\u043b\u0438\u0441\u0442","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["ekspert","\u044d\u043a\u0441\u043f\u0435\u0440\u0442","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["konsultant","\u043a\u043e\u043d\u0441\u0443\u043b\u044c\u0442\u0430\u043d\u0442","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["analityk","\u0430\u043d\u0430\u043b\u0438\u0442\u0438\u043a","\u0440\u0430\u0431\u043e\u0442\u0430","C1"],
+["programista","\u043f\u0440\u043e\u0433\u0440\u0430\u043c\u043c\u0438\u0441\u0442","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["prawnicy","\u044e\u0440\u0438\u0441\u0442\u044b","\u0440\u0430\u0431\u043e\u0442\u0430","C1"],
+["księgowy","\u0431\u0443\u0445\u0433\u0430\u043b\u0442\u0435\u0440","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["marketing","\u043c\u0430\u0440\u043a\u0435\u0442\u0438\u043d\u0433","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["sprzedaż","\u043f\u0440\u043e\u0434\u0430\u0436\u0438","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["obsługa klienta","\u043e\u0431\u0441\u043b\u0443\u0436\u0438\u0432\u0430\u043d\u0438\u0435 \u043a\u043b\u0438\u0435\u043d\u0442\u043e\u0432","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["szkolenie","\u043e\u0431\u0443\u0447\u0435\u043d\u0438\u0435/\u0442\u0440\u0435\u043d\u0438\u043d\u0433","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["certyfikat","\u0441\u0435\u0440\u0442\u0438\u0444\u0438\u043a\u0430\u0442","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["portfolio","\u043f\u043e\u0440\u0442\u0444\u043e\u043b\u0438\u043e","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["referencje","\u0440\u0435\u043a\u043e\u043c\u0435\u043d\u0434\u0430\u0446\u0438\u0438","\u0440\u0430\u0431\u043e\u0442\u0430","C1"],
+["zadanie","\u0437\u0430\u0434\u0430\u043d\u0438\u0435/\u0437\u0430\u0434\u0430\u0447\u0430","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["cel","\u0446\u0435\u043b\u044c","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["wynik","\u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["raport","\u043e\u0442\u0447\u0451\u0442","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["prezentacja","\u043f\u0440\u0435\u0437\u0435\u043d\u0442\u0430\u0446\u0438\u044f","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["spotkanie","\u0432\u0441\u0442\u0440\u0435\u0447\u0430","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["konferencja","\u043a\u043e\u043d\u0444\u0435\u0440\u0435\u043d\u0446\u0438\u044f","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["biuro","\u043e\u0444\u0438\u0441","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["home office","\u0443\u0434\u0430\u043b\u0451\u043d\u043d\u0430\u044f \u0440\u0430\u0431\u043e\u0442\u0430","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["płatny urlop","\u043e\u043f\u043b\u0430\u0447\u0438\u0432\u0430\u0435\u043c\u044b\u0439 \u043e\u0442\u043f\u0443\u0441\u043a","\u0440\u0430\u0431\u043e\u0442\u0430","C1"],
+["zwolnienie lekarskie","\u0431\u043e\u043b\u044c\u043d\u0438\u0447\u043d\u044b\u0439","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["emerytura","\u043f\u0435\u043d\u0441\u0438\u044f","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["pracować na etacie","\u0440\u0430\u0431\u043e\u0442\u0430\u0442\u044c \u043d\u0430 \u043f\u043e\u043b\u043d\u043e\u0439 \u0441\u0442\u0430\u0432\u043a\u0435","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["praca na pół etatu","\u0440\u0430\u0431\u043e\u0442\u0430 \u043d\u0430 \u043f\u043e\u043b\u0441\u0442\u0430\u0432\u043a\u0438","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["praca dorywcza","\u043f\u043e\u0434\u0440\u0430\u0431\u043e\u0442\u043a\u0430","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["freelancer","\u0444\u0440\u0438\u043b\u0430\u043d\u0441\u0435\u0440","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["podwyżka płacy","\u043f\u043e\u0432\u044b\u0448\u0435\u043d\u0438\u0435 \u043e\u043a\u043b\u0430\u0434\u0430","\u0440\u0430\u0431\u043e\u0442\u0430","C1"],
+["benefity","\u0431\u0435\u043d\u0435\u0444\u0438\u0442\u044b/\u043b\u044c\u0433\u043e\u0442\u044b","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["premie","\u043f\u0440\u0435\u043c\u0438\u044f/\u0431\u043e\u043d\u0443\u0441","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["odprawy","\u0432\u044b\u0445\u043e\u0434\u043d\u043e\u0435 \u043f\u043e\u0441\u043e\u0431\u0438\u0435","\u0440\u0430\u0431\u043e\u0442\u0430","C1"],
+["pensja","\u043e\u043a\u043b\u0430\u0434/\u0436\u0430\u043b\u043e\u0432\u0430\u043d\u044c\u0435","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["zasiłek","\u043f\u043e\u0441\u043e\u0431\u0438\u0435","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+// ЭМОЦИИ
+["pracodawca","\u0440\u0430\u0431\u043e\u0442\u043e\u0434\u0430\u0442\u0435\u043b\u044c","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["pracownik","\u0441\u043e\u0442\u0440\u0443\u0434\u043d\u0438\u043a","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["wynagrodzenie","\u0437\u0430\u0440\u0430\u0431\u043e\u0442\u043d\u0430\u044f \u043f\u043b\u0430\u0442\u0430","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["podwyżka","\u043f\u043e\u0432\u044b\u0448\u0435\u043d\u0438\u0435 \u0437\u0430\u0440\u043f\u043b\u0430\u0442\u044b","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["awans","\u043f\u0440\u043e\u0434\u0432\u0438\u0436\u0435\u043d\u0438\u0435 \u043f\u043e \u0441\u043b\u0443\u0436\u0431\u0435","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["zwolnienie","\u0443\u0432\u043e\u043b\u044c\u043d\u0435\u043d\u0438\u0435","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["urlop","\u043e\u0442\u043f\u0443\u0441\u043a","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["obowiązki","\u043e\u0431\u044f\u0437\u0430\u043d\u043d\u043e\u0441\u0442\u0438","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["umowa o pracę","\u0442\u0440\u0443\u0434\u043e\u0432\u043e\u0439 \u0434\u043e\u0433\u043e\u0432\u043e\u0440","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["kandydat","\u043a\u0430\u043d\u0434\u0438\u0434\u0430\u0442","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["rekrutacja","\u0440\u0435\u043a\u0440\u0443\u0442\u0438\u043d\u0433","\u0440\u0430\u0431\u043e\u0442\u0430","C1"],
+["wdrożenie","\u0432\u043d\u0435\u0434\u0440\u0435\u043d\u0438\u0435/\u043e\u043d\u0431\u043e\u0440\u0434\u0438\u043d\u0433","\u0440\u0430\u0431\u043e\u0442\u0430","C1"],
+["zebranie","\u0441\u043e\u0432\u0435\u0449\u0430\u043d\u0438\u0435","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["termin","\u0434\u0435\u0434\u043b\u0430\u0439\u043d/\u0441\u0440\u043e\u043a","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["projekt","\u043f\u0440\u043e\u0435\u043a\u0442","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["budżet","\u0431\u044e\u0434\u0436\u0435\u0442","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["doświadczenie zawodowe","\u043e\u043f\u044b\u0442 \u0440\u0430\u0431\u043e\u0442\u044b","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["kwalifikacje","\u043a\u0432\u0430\u043b\u0438\u0444\u0438\u043a\u0430\u0446\u0438\u0438","\u0440\u0430\u0431\u043e\u0442\u0430","C1"],
+["negocjacje","\u043f\u0435\u0440\u0435\u0433\u043e\u0432\u043e\u0440\u044b","\u0440\u0430\u0431\u043e\u0442\u0430","C1"],
+["delegacja","\u043a\u043e\u043c\u0430\u043d\u0434\u0438\u0440\u043e\u0432\u043a\u0430","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["kontrakt","\u043a\u043e\u043d\u0442\u0440\u0430\u043a\u0442","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["firma","\u043a\u043e\u043c\u043f\u0430\u043d\u0438\u044f/\u0444\u0438\u0440\u043c\u0430","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["korporacja","\u043a\u043e\u0440\u043f\u043e\u0440\u0430\u0446\u0438\u044f","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["startup","\u0441\u0442\u0430\u0440\u0442\u0430\u043f","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["branża","\u043e\u0442\u0440\u0430\u0441\u043b\u044c","\u0440\u0430\u0431\u043e\u0442\u0430","C1"],
+["rynek pracy","\u0440\u044b\u043d\u043e\u043a \u0442\u0440\u0443\u0434\u0430","\u0440\u0430\u0431\u043e\u0442\u0430","C1"],
+["bezrobocie","\u0431\u0435\u0437\u0440\u0430\u0431\u043e\u0442\u0438\u0446\u0430","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+["samozatrudnienie","\u0441\u0430\u043c\u043e\u0437\u0430\u043d\u044f\u0442\u043e\u0441\u0442\u044c","\u0440\u0430\u0431\u043e\u0442\u0430","C1"],
+["nadgodziny","\u0441\u0432\u0435\u0440\u0445\u0443\u0440\u043e\u0447\u043d\u044b\u0435","\u0440\u0430\u0431\u043e\u0442\u0430","B2"],
+// ЭМОЦИИ
+["szczęście","\u0441\u0447\u0430\u0441\u0442\u044c\u0435","\u044d\u043c\u043e\u0446\u0438\u0438","B2"],
+["smutek","\u0433\u0440\u0443\u0441\u0442\u044c","\u044d\u043c\u043e\u0446\u0438\u0438","B2"],
+["złość","\u0437\u043b\u043e\u0441\u0442\u044c/\u0433\u043d\u0435\u0432","\u044d\u043c\u043e\u0446\u0438\u0438","B2"],
+["radość","\u0440\u0430\u0434\u043e\u0441\u0442\u044c","\u044d\u043c\u043e\u0446\u0438\u0438","B2"],
+["strach","\u0441\u0442\u0440\u0430\u0445","\u044d\u043c\u043e\u0446\u0438\u0438","B2"],
+["wstyd","\u0441\u0442\u044b\u0434","\u044d\u043c\u043e\u0446\u0438\u0438","B2"],
+["duma","\u0433\u043e\u0440\u0434\u043e\u0441\u0442\u044c","\u044d\u043c\u043e\u0446\u0438\u0438","B2"],
+["zazdrość","\u0437\u0430\u0432\u0438\u0441\u0442\u044c/\u0440\u0435\u0432\u043d\u043e\u0441\u0442\u044c","\u044d\u043c\u043e\u0446\u0438\u0438","B2"],
+["tęsknota","\u0442\u043e\u0441\u043a\u0430/\u043d\u043e\u0441\u0442\u0430\u043b\u044c\u0433\u0438\u044f","\u044d\u043c\u043e\u0446\u0438\u0438","C1"],
+["rozgoryczenie","\u0440\u0430\u0437\u043e\u0447\u0430\u0440\u043e\u0432\u0430\u043d\u0438\u0435","\u044d\u043c\u043e\u0446\u0438\u0438","C1"],
+["rozdrażnienie","\u0440\u0430\u0437\u0434\u0440\u0430\u0436\u0435\u043d\u0438\u0435","\u044d\u043c\u043e\u0446\u0438\u0438","C1"],
+["entuzjazm","\u044d\u043d\u0442\u0443\u0437\u0438\u0430\u0437\u043c","\u044d\u043c\u043e\u0446\u0438\u0438","B2"],
+["niepokój","\u0431\u0435\u0441\u043f\u043e\u043a\u043e\u0439\u0441\u0442\u0432\u043e","\u044d\u043c\u043e\u0446\u0438\u0438","C1"],
+["melancholia","\u043c\u0435\u043b\u0430\u043d\u0445\u043e\u043b\u0438\u044f","\u044d\u043c\u043e\u0446\u0438\u0438","C1"],
+["euforia","\u044d\u0439\u0444\u043e\u0440\u0438\u044f","\u044d\u043c\u043e\u0446\u0438\u0438","C1"],
+["frustracja","\u0444\u0440\u0443\u0441\u0442\u0440\u0430\u0446\u0438\u044f","\u044d\u043c\u043e\u0446\u0438\u0438","B2"],
+["ulga","\u043e\u0431\u043b\u0435\u0433\u0447\u0435\u043d\u0438\u0435","\u044d\u043c\u043e\u0446\u0438\u0438","B2"],
+["wzruszenie","\u0432\u043e\u043b\u043d\u0435\u043d\u0438\u0435/\u0443\u043c\u0438\u043b\u0435\u043d\u0438\u0435","\u044d\u043c\u043e\u0446\u0438\u0438","C1"],
+["wdzięczność","\u0431\u043b\u0430\u0433\u043e\u0434\u0430\u0440\u043d\u043e\u0441\u0442\u044c","\u044d\u043c\u043e\u0446\u0438\u0438","C1"],
+["obawa","\u043e\u043f\u0430\u0441\u0435\u043d\u0438\u0435","\u044d\u043c\u043e\u0446\u0438\u0438","C1"],
+// ОБЩЕНИЕ
+["rozmowa","\u0440\u0430\u0437\u0433\u043e\u0432\u043e\u0440","\u043e\u0431\u0449\u0435\u043d\u0438\u0435","B2"],
+["dyskusja","\u0434\u0438\u0441\u043a\u0443\u0441\u0441\u0438\u044f","\u043e\u0431\u0449\u0435\u043d\u0438\u0435","B2"],
+["kłótnia","\u0441\u0441\u043e\u0440\u0430","\u043e\u0431\u0449\u0435\u043d\u0438\u0435","B2"],
+["przeprosiny","\u0438\u0437\u0432\u0438\u043d\u0435\u043d\u0438\u044f","\u043e\u0431\u0449\u0435\u043d\u0438\u0435","B2"],
+["pochwała","\u043f\u043e\u0445\u0432\u0430\u043b\u0430","\u043e\u0431\u0449\u0435\u043d\u0438\u0435","B2"],
+["krytyka","\u043a\u0440\u0438\u0442\u0438\u043a\u0430","\u043e\u0431\u0449\u0435\u043d\u0438\u0435","B2"],
+["sugestia","\u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u0435/\u0441\u043e\u0432\u0435\u0442","\u043e\u0431\u0449\u0435\u043d\u0438\u0435","B2"],
+["pytanie","\u0432\u043e\u043f\u0440\u043e\u0441","\u043e\u0431\u0449\u0435\u043d\u0438\u0435","B2"],
+["odpowiedź","\u043e\u0442\u0432\u0435\u0442","\u043e\u0431\u0449\u0435\u043d\u0438\u0435","B2"],
+["zgoda","\u0441\u043e\u0433\u043b\u0430\u0441\u0438\u0435","\u043e\u0431\u0449\u0435\u043d\u0438\u0435","B2"],
+["sprzeciw","\u0432\u043e\u0437\u0440\u0430\u0436\u0435\u043d\u0438\u0435","\u043e\u0431\u0449\u0435\u043d\u0438\u0435","C1"],
+["nieporozumienie","\u043d\u0435\u0434\u043e\u043f\u043e\u043d\u0438\u043c\u0430\u043d\u0438\u0435","\u043e\u0431\u0449\u0435\u043d\u0438\u0435","C1"],
+["kompromis","\u043a\u043e\u043c\u043f\u0440\u043e\u043c\u0438\u0441\u0441","\u043e\u0431\u0449\u0435\u043d\u0438\u0435","C1"],
+["plotka","\u0441\u043f\u043b\u0435\u0442\u043d\u044f","\u043e\u0431\u0449\u0435\u043d\u0438\u0435","B2"],
+["żart","\u0448\u0443\u0442\u043a\u0430","\u043e\u0431\u0449\u0435\u043d\u0438\u0435","B2"],
+["sarkazm","\u0441\u0430\u0440\u043a\u0430\u0437\u043c","\u043e\u0431\u0449\u0435\u043d\u0438\u0435","C1"],
+["ironia","\u0438\u0440\u043e\u043d\u0438\u044f","\u043e\u0431\u0449\u0435\u043d\u0438\u0435","C1"],
+["uprzejmość","\u0432\u0435\u0436\u043b\u0438\u0432\u043e\u0441\u0442\u044c","\u043e\u0431\u0449\u0435\u043d\u0438\u0435","B2"],
+["ton głosu","\u0438\u043d\u0442\u043e\u043d\u0430\u0446\u0438\u044f/\u0442\u043e\u043d","\u043e\u0431\u0449\u0435\u043d\u0438\u0435","C1"],
+["mowa ciała","\u044f\u0437\u044b\u043a \u0442\u0435\u043b\u0430","\u043e\u0431\u0449\u0435\u043d\u0438\u0435","C1"],
+// ВРЕМЯ
+["teraz","\u0441\u0435\u0439\u0447\u0430\u0441","\u0432\u0440\u0435\u043c\u044f","B2"],
+["wcześniej","\u0440\u0430\u043d\u044c\u0448\u0435","\u0432\u0440\u0435\u043c\u044f","B2"],
+["później","\u043f\u043e\u0437\u0436\u0435","\u0432\u0440\u0435\u043c\u044f","B2"],
+["ostatnio","\u043d\u0435\u0434\u0430\u0432\u043d\u043e","\u0432\u0440\u0435\u043c\u044f","B2"],
+["wkrótce","\u0441\u043a\u043e\u0440\u043e","\u0432\u0440\u0435\u043c\u044f","B2"],
+["jednocześnie","\u043e\u0434\u043d\u043e\u0432\u0440\u0435\u043c\u0435\u043d\u043d\u043e","\u0432\u0440\u0435\u043c\u044f","C1"],
+["tymczasem","\u0442\u0435\u043c \u0432\u0440\u0435\u043c\u0435\u043d\u0435\u043c","\u0432\u0440\u0435\u043c\u044f","C1"],
+["niegdyś","\u043d\u0435\u043a\u043e\u0433\u0434\u0430/\u043a\u043e\u0433\u0434\u0430-\u0442\u043e","\u0432\u0440\u0435\u043c\u044f","C1"],
+["odtąd","\u0441 \u0442\u0435\u0445 \u043f\u043e\u0440","\u0432\u0440\u0435\u043c\u044f","C1"],
+["dotychczas","\u0434\u043e \u0441\u0438\u0445 \u043f\u043e\u0440","\u0432\u0440\u0435\u043c\u044f","C1"],
+["natychmiast","\u043d\u0435\u043c\u0435\u0434\u043b\u0435\u043d\u043d\u043e","\u0432\u0440\u0435\u043c\u044f","B2"],
+["stopniowo","\u043f\u043e\u0441\u0442\u0435\u043f\u0435\u043d\u043d\u043e","\u0432\u0440\u0435\u043c\u044f","C1"],
+["coraz bardziej","\u0432\u0441\u0451 \u0431\u043e\u043b\u044c\u0448\u0435 \u0438 \u0431\u043e\u043b\u044c\u0448\u0435","\u0432\u0440\u0435\u043c\u044f","B2"],
+["przez chwilę","\u043d\u0430 \u043c\u0433\u043d\u043e\u0432\u0435\u043d\u0438\u0435","\u0432\u0440\u0435\u043c\u044f","B2"],
+["w końcu","\u0432 \u043a\u043e\u043d\u0446\u0435 \u043a\u043e\u043d\u0446\u043e\u0432","\u0432\u0440\u0435\u043c\u044f","B2"],
+["na razie","\u043f\u043e\u043a\u0430 \u0447\u0442\u043e","\u0432\u0440\u0435\u043c\u044f","B2"],
+["od razu","\u0441\u0440\u0430\u0437\u0443 \u0436\u0435","\u0432\u0440\u0435\u043c\u044f","B2"],
+["z góry","\u0437\u0430\u0440\u0430\u043d\u0435\u0435","\u0432\u0440\u0435\u043c\u044f","C1"],
+// ЕДА
+["jedzenie","\u0435\u0434\u0430","\u0435\u0434\u0430","B2"],
+["śniadanie","\u0437\u0430\u0432\u0442\u0440\u0430\u043a","\u0435\u0434\u0430","B2"],
+["obiad","\u043e\u0431\u0435\u0434","\u0435\u0434\u0430","B2"],
+["kolacja","\u0443\u0436\u0438\u043d","\u0435\u0434\u0430","B2"],
+["napój","\u043d\u0430\u043f\u0438\u0442\u043e\u043a","\u0435\u0434\u0430","B2"],
+["smaczny","\u0432\u043a\u0443\u0441\u043d\u044b\u0439","\u0435\u0434\u0430","B2"],
+["słodki","\u0441\u043b\u0430\u0434\u043a\u0438\u0439","\u0435\u0434\u0430","B2"],
+["słony","\u0441\u043e\u043b\u0451\u043d\u044b\u0439","\u0435\u0434\u0430","B2"],
+["ostry","\u043e\u0441\u0442\u0440\u044b\u0439","\u0435\u0434\u0430","B2"],
+["kwaśny","\u043a\u0438\u0441\u043b\u044b\u0439","\u0435\u0434\u0430","B2"],
+["gorzki","\u0433\u043e\u0440\u044c\u043a\u0438\u0439","\u0435\u0434\u0430","B2"],
+["przepis","\u0440\u0435\u0446\u0435\u043f\u0442","\u0435\u0434\u0430","B2"],
+["składnik","\u0438\u043d\u0433\u0440\u0435\u0434\u0438\u0435\u043d\u0442","\u0435\u0434\u0430","B2"],
+["danie","\u0431\u043b\u044e\u0434\u043e","\u0435\u0434\u0430","B2"],
+["porcja","\u043f\u043e\u0440\u0446\u0438\u044f","\u0435\u0434\u0430","B2"],
+["restauracja","\u0440\u0435\u0441\u0442\u043e\u0440\u0430\u043d","\u0435\u0434\u0430","B2"],
+["kelner","\u043e\u0444\u0438\u0446\u0438\u0430\u043d\u0442","\u0435\u0434\u0430","B2"],
+["rachunek","\u0441\u0447\u0451\u0442","\u0435\u0434\u0430","B2"],
+["napiwek","\u0447\u0430\u0435\u0432\u044b\u0435","\u0435\u0434\u0430","B2"],
+["wegetarian/ka","\u0432\u0435\u0433\u0435\u0442\u0430\u0440\u0438\u0430\u043d\u0435\u0446/\u043a\u0430","\u0435\u0434\u0430","B2"],
+// ТРАНСПОРТ
+["samochód","\u0430\u0432\u0442\u043e\u043c\u043e\u0431\u0438\u043b\u044c","\u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442","B2"],
+["pociąg","\u043f\u043e\u0435\u0437\u0434","\u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442","B2"],
+["autobus","\u0430\u0432\u0442\u043e\u0431\u0443\u0441","\u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442","B2"],
+["metro","\u043c\u0435\u0442\u0440\u043e","\u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442","B2"],
+["tramwaj","\u0442\u0440\u0430\u043c\u0432\u0430\u0439","\u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442","B2"],
+["rower","\u0432\u0435\u043b\u043e\u0441\u0438\u043f\u0435\u0434","\u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442","B2"],
+["samolot","\u0441\u0430\u043c\u043e\u043b\u0451\u0442","\u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442","B2"],
+["lotnisko","\u0430\u044d\u0440\u043e\u043f\u043e\u0440\u0442","\u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442","B2"],
+["stacja","\u0441\u0442\u0430\u043d\u0446\u0438\u044f","\u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442","B2"],
+["dworzec","\u0432\u043e\u043a\u0437\u0430\u043b","\u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442","B2"],
+["bilet","\u0431\u0438\u043b\u0435\u0442","\u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442","B2"],
+["korek","\u043f\u0440\u043e\u0431\u043a\u0430 (\u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442\u043d\u0430\u044f)","\u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442","B2"],
+["parking","\u043f\u0430\u0440\u043a\u043e\u0432\u043a\u0430","\u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442","B2"],
+["kierowca","\u0432\u043e\u0434\u0438\u0442\u0435\u043b\u044c","\u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442","B2"],
+["pasażer","\u043f\u0430\u0441\u0441\u0430\u0436\u0438\u0440","\u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442","B2"],
+["benzyna","\u0431\u0435\u043d\u0437\u0438\u043d","\u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442","B2"],
+["trasa","\u043c\u0430\u0440\u0448\u0440\u0443\u0442","\u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442","B2"],
+["opóźnienie","\u0437\u0430\u0434\u0435\u0440\u0436\u043a\u0430","\u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442","B2"],
+["odlot","\u0432\u044b\u043b\u0435\u0442","\u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442","B2"],
+// ТЕЛО
+["ciało","\u0442\u0435\u043b\u043e","\u0442\u0435\u043b\u043e","B2"],
+["głowa","\u0433\u043e\u043b\u043e\u0432\u0430","\u0442\u0435\u043b\u043e","B2"],
+["twarz","\u043b\u0438\u0446\u043e","\u0442\u0435\u043b\u043e","B2"],
+["oczy","\u0433\u043b\u0430\u0437\u0430","\u0442\u0435\u043b\u043e","B2"],
+["usta","\u0440\u043e\u0442","\u0442\u0435\u043b\u043e","B2"],
+["ręce","\u0440\u0443\u043a\u0438","\u0442\u0435\u043b\u043e","B2"],
+["nogi","\u043d\u043e\u0433\u0438","\u0442\u0435\u043b\u043e","B2"],
+["serce","\u0441\u0435\u0440\u0434\u0446\u0435","\u0442\u0435\u043b\u043e","B2"],
+["mózg","\u043c\u043e\u0437\u0433","\u0442\u0435\u043b\u043e","B2"],
+["krew","\u043a\u0440\u043e\u0432\u044c","\u0442\u0435\u043b\u043e","B2"],
+["ból","\u0431\u043e\u043b\u044c","\u0442\u0435\u043b\u043e","B2"],
+["choroba","\u0431\u043e\u043b\u0435\u0437\u043d\u044c","\u0442\u0435\u043b\u043e","B2"],
+["leczenie","\u043b\u0435\u0447\u0435\u043d\u0438\u0435","\u0442\u0435\u043b\u043e","B2"],
+["lekarz","\u0432\u0440\u0430\u0447","\u0442\u0435\u043b\u043e","B2"],
+["szpital","\u0431\u043e\u043b\u044c\u043d\u0438\u0446\u0430","\u0442\u0435\u043b\u043e","B2"],
+["zdrowie","\u0437\u0434\u043e\u0440\u043e\u0432\u044c\u0435","\u0442\u0435\u043b\u043e","B2"],
+["zmęczony","\u0443\u0441\u0442\u0430\u043b\u044b\u0439","\u0442\u0435\u043b\u043e","B2"],
+["silny","\u0441\u0438\u043b\u044c\u043d\u044b\u0439","\u0442\u0435\u043b\u043e","B2"],
+["słaby","\u0441\u043b\u0430\u0431\u044b\u0439","\u0442\u0435\u043b\u043e","B2"],
+// ДЕНЬГИ
+["pieniądze","\u0434\u0435\u043d\u044c\u0433\u0438","\u0434\u0435\u043d\u044c\u0433\u0438","B2"],
+["cena","\u0446\u0435\u043d\u0430","\u0434\u0435\u043d\u044c\u0433\u0438","B2"],
+["koszt","\u0441\u0442\u043e\u0438\u043c\u043e\u0441\u0442\u044c","\u0434\u0435\u043d\u044c\u0433\u0438","B2"],
+["oszczędności","\u0441\u0431\u0435\u0440\u0435\u0436\u0435\u043d\u0438\u044f","\u0434\u0435\u043d\u044c\u0433\u0438","B2"],
+["wydatek","\u0440\u0430\u0441\u0445\u043e\u0434","\u0434\u0435\u043d\u044c\u0433\u0438","B2"],
+["dług","\u0434\u043e\u043b\u0433","\u0434\u0435\u043d\u044c\u0433\u0438","B2"],
+["pożyczka","\u0437\u0430\u0439\u043c","\u0434\u0435\u043d\u044c\u0433\u0438","B2"],
+["kredyt","\u043a\u0440\u0435\u0434\u0438\u0442","\u0434\u0435\u043d\u044c\u0433\u0438","B2"],
+["konto bankowe","\u0431\u0430\u043d\u043a\u043e\u0432\u0441\u043a\u0438\u0439 \u0441\u0447\u0451\u0442","\u0434\u0435\u043d\u044c\u0433\u0438","B2"],
+["podatek","\u043d\u0430\u043b\u043e\u0433","\u0434\u0435\u043d\u044c\u0433\u0438","C1"],
+["inwestycja","\u0438\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u044f","\u0434\u0435\u043d\u044c\u0433\u0438","C1"],
+["zysk","\u043f\u0440\u0438\u0431\u044b\u043b\u044c","\u0434\u0435\u043d\u044c\u0433\u0438","C1"],
+["strata","\u0443\u0431\u044b\u0442\u043e\u043a","\u0434\u0435\u043d\u044c\u0433\u0438","C1"],
+["inflacja","\u0438\u043d\u0444\u043b\u044f\u0446\u0438\u044f","\u0434\u0435\u043d\u044c\u0433\u0438","C1"],
+["waluta","\u0432\u0430\u043b\u044e\u0442\u0430","\u0434\u0435\u043d\u044c\u0433\u0438","C1"],
+["kurs wymiany","\u043e\u0431\u043c\u0435\u043d\u043d\u044b\u0439 \u043a\u0443\u0440\u0441","\u0434\u0435\u043d\u044c\u0433\u0438","C1"],
+// УЧЁБА
+["szkoła","\u0448\u043a\u043e\u043b\u0430","\u0443\u0447\u0451\u0431\u0430","B2"],
+["uczelnia","\u0432\u0443\u0437","\u0443\u0447\u0451\u0431\u0430","B2"],
+["studia","\u0443\u0447\u0451\u0431\u0430 \u0432 \u0432\u0443\u0437\u0435","\u0443\u0447\u0451\u0431\u0430","B2"],
+["egzamin","\u044d\u043a\u0437\u0430\u043c\u0435\u043d","\u0443\u0447\u0451\u0431\u0430","B2"],
+["ocena","\u043e\u0446\u0435\u043d\u043a\u0430","\u0443\u0447\u0451\u0431\u0430","B2"],
+["sprawdzian","\u043a\u043e\u043d\u0442\u0440\u043e\u043b\u044c\u043d\u0430\u044f","\u0443\u0447\u0451\u0431\u0430","B2"],
+["praca domowa","\u0434\u043e\u043c\u0430\u0448\u043d\u0435\u0435 \u0437\u0430\u0434\u0430\u043d\u0438\u0435","\u0443\u0447\u0451\u0431\u0430","B2"],
+["wykład","\u043b\u0435\u043a\u0446\u0438\u044f","\u0443\u0447\u0451\u0431\u0430","B2"],
+["ćwiczenia","\u043f\u0440\u0430\u043a\u0442\u0438\u0447\u0435\u0441\u043a\u0438\u0435 \u0437\u0430\u043d\u044f\u0442\u0438\u044f","\u0443\u0447\u0451\u0431\u0430","B2"],
+["stypendium","\u0441\u0442\u0438\u043f\u0435\u043d\u0434\u0438\u044f","\u0443\u0447\u0451\u0431\u0430","C1"],
+["dyplom","\u0434\u0438\u043f\u043b\u043e\u043c","\u0443\u0447\u0451\u0431\u0430","B2"],
+["absolwent","\u0432\u044b\u043f\u0443\u0441\u043a\u043d\u0438\u043a","\u0443\u0447\u0451\u0431\u0430","B2"],
+["profesor","\u043f\u0440\u043e\u0444\u0435\u0441\u0441\u043e\u0440","\u0443\u0447\u0451\u0431\u0430","B2"],
+["seminarium","\u0441\u0435\u043c\u0438\u043d\u0430\u0440","\u0443\u0447\u0451\u0431\u0430","C1"],
+["biblioteka","\u0431\u0438\u0431\u043b\u0438\u043e\u0442\u0435\u043a\u0430","\u0443\u0447\u0451\u0431\u0430","B2"],
+// ПОЛИТИКА
+["rząd","\u043f\u0440\u0430\u0432\u0438\u0442\u0435\u043b\u044c\u0441\u0442\u0432\u043e","\u043f\u043e\u043b\u0438\u0442\u0438\u043a\u0430","C1"],
+["parlament","\u043f\u0430\u0440\u043b\u0430\u043c\u0435\u043d\u0442","\u043f\u043e\u043b\u0438\u0442\u0438\u043a\u0430","C1"],
+["wybory","\u0432\u044b\u0431\u043e\u0440\u044b","\u043f\u043e\u043b\u0438\u0442\u0438\u043a\u0430","C1"],
+["prezydent","\u043f\u0440\u0435\u0437\u0438\u0434\u0435\u043d\u0442","\u043f\u043e\u043b\u0438\u0442\u0438\u043a\u0430","C1"],
+["premier","\u043f\u0440\u0435\u043c\u044c\u0435\u0440-\u043c\u0438\u043d\u0438\u0441\u0442\u0440","\u043f\u043e\u043b\u0438\u0442\u0438\u043a\u0430","C1"],
+["partia","\u043f\u0430\u0440\u0442\u0438\u044f","\u043f\u043e\u043b\u0438\u0442\u0438\u043a\u0430","C1"],
+["ustawa","\u0437\u0430\u043a\u043e\u043d/\u0437\u0430\u043a\u043e\u043d\u043e\u043f\u0440\u043e\u0435\u043a\u0442","\u043f\u043e\u043b\u0438\u0442\u0438\u043a\u0430","C1"],
+["konstytucja","\u043a\u043e\u043d\u0441\u0442\u0438\u0442\u0443\u0446\u0438\u044f","\u043f\u043e\u043b\u0438\u0442\u0438\u043a\u0430","C1"],
+["prawa człowieka","\u043f\u0440\u0430\u0432\u0430 \u0447\u0435\u043b\u043e\u0432\u0435\u043a\u0430","\u043f\u043e\u043b\u0438\u0442\u0438\u043a\u0430","C1"],
+["obywatel","\u0433\u0440\u0430\u0436\u0434\u0430\u043d\u0438\u043d","\u043f\u043e\u043b\u0438\u0442\u0438\u043a\u0430","C1"],
+["demokracja","\u0434\u0435\u043c\u043e\u043a\u0440\u0430\u0442\u0438\u044f","\u043f\u043e\u043b\u0438\u0442\u0438\u043a\u0430","C1"],
+["wolność słowa","\u0441\u0432\u043e\u0431\u043e\u0434\u0430 \u0441\u043b\u043e\u0432\u0430","\u043f\u043e\u043b\u0438\u0442\u0438\u043a\u0430","C1"],
+// ТЕХНОЛОГИИ
+["komputer","\u043a\u043e\u043c\u043f\u044c\u044e\u0442\u0435\u0440","\u0442\u0435\u0445\u043d\u043e\u043b\u043e\u0433\u0438\u0438","B2"],
+["internet","\u0438\u043d\u0442\u0435\u0440\u043d\u0435\u0442","\u0442\u0435\u0445\u043d\u043e\u043b\u043e\u0433\u0438\u0438","B2"],
+["aplikacja","\u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435","\u0442\u0435\u0445\u043d\u043e\u043b\u043e\u0433\u0438\u0438","B2"],
+["oprogramowanie","\u043f\u0440\u043e\u0433\u0440\u0430\u043c\u043c\u043d\u043e\u0435 \u043e\u0431\u0435\u0441\u043f\u0435\u0447\u0435\u043d\u0438\u0435","\u0442\u0435\u0445\u043d\u043e\u043b\u043e\u0433\u0438\u0438","B2"],
+["aktualizacja","\u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u0435","\u0442\u0435\u0445\u043d\u043e\u043b\u043e\u0433\u0438\u0438","B2"],
+["hasło","\u043f\u0430\u0440\u043e\u043b\u044c","\u0442\u0435\u0445\u043d\u043e\u043b\u043e\u0433\u0438\u0438","B2"],
+["sieć","\u0441\u0435\u0442\u044c","\u0442\u0435\u0445\u043d\u043e\u043b\u043e\u0433\u0438\u0438","B2"],
+["chmura","\u043e\u0431\u043b\u0430\u043a\u043e","\u0442\u0435\u0445\u043d\u043e\u043b\u043e\u0433\u0438\u0438","B2"],
+["sztuczna inteligencja","\u0438\u0441\u043a\u0443\u0441\u0441\u0442\u0432\u0435\u043d\u043d\u044b\u0439 \u0438\u043d\u0442\u0435\u043b\u043b\u0435\u043a\u0442","\u0442\u0435\u0445\u043d\u043e\u043b\u043e\u0433\u0438\u0438","C1"],
+["dane","\u0434\u0430\u043d\u043d\u044b\u0435","\u0442\u0435\u0445\u043d\u043e\u043b\u043e\u0433\u0438\u0438","B2"],
+["bezpieczeństwo","\u0431\u0435\u0437\u043e\u043f\u0430\u0441\u043d\u043e\u0441\u0442\u044c","\u0442\u0435\u0445\u043d\u043e\u043b\u043e\u0433\u0438\u0438","B2"],
+["hakerstwo","\u0445\u0430\u043a\u0435\u0440\u0441\u0442\u0432\u043e","\u0442\u0435\u0445\u043d\u043e\u043b\u043e\u0433\u0438\u0438","C1"],
+// ГЛАГОЛЫ B2
+["osiągnąć","\u0434\u043e\u0441\u0442\u0438\u0433\u0430\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["rozważyć","\u0440\u0430\u0441\u0441\u043c\u043e\u0442\u0440\u0435\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["zrealizować","\u0440\u0435\u0430\u043b\u0438\u0437\u043e\u0432\u0430\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["wspierać","\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u0438\u0432\u0430\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["zaproponować","\u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0438\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["poradzić sobie","\u0441\u043f\u0440\u0430\u0432\u0438\u0442\u044c\u0441\u044f","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["zmierzyć się","\u0441\u0442\u043e\u043b\u043a\u043d\u0443\u0442\u044c\u0441\u044f \u0441","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","C1"],
+["podejmować decyzję","\u043f\u0440\u0438\u043d\u0438\u043c\u0430\u0442\u044c \u0440\u0435\u0448\u0435\u043d\u0438\u0435","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["rozwiązać","\u0440\u0435\u0448\u0438\u0442\u044c/\u0440\u0430\u0437\u0440\u0435\u0448\u0438\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["oceniać","\u043e\u0446\u0435\u043d\u0438\u0432\u0430\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["analizować","\u0430\u043d\u0430\u043b\u0438\u0437\u0438\u0440\u043e\u0432\u0430\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["porównywać","\u0441\u0440\u0430\u0432\u043d\u0438\u0432\u0430\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["wyobrażać sobie","\u043f\u0440\u0435\u0434\u0441\u0442\u0430\u0432\u043b\u044f\u0442\u044c \u0441\u0435\u0431\u0435","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["przekonać","\u0443\u0431\u0435\u0434\u0438\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["zakwestionować","\u043f\u043e\u0441\u0442\u0430\u0432\u0438\u0442\u044c \u043f\u043e\u0434 \u0441\u043e\u043c\u043d\u0435\u043d\u0438\u0435","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","C1"],
+["skoncentrować się","\u0441\u043e\u0441\u0440\u0435\u0434\u043e\u0442\u043e\u0447\u0438\u0442\u044c\u0441\u044f","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["zrezygnować","\u043e\u0442\u043a\u0430\u0437\u0430\u0442\u044c\u0441\u044f/\u0443\u0439\u0442\u0438","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["nalegać","\u043d\u0430\u0441\u0442\u0430\u0438\u0432\u0430\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","C1"],
+["odmawiać","\u043e\u0442\u043a\u0430\u0437\u044b\u0432\u0430\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["zatwierdzić","\u0443\u0442\u0432\u0435\u0440\u0436\u0434\u0430\u0442\u044c/\u043e\u0434\u043e\u0431\u0440\u044f\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","C1"],
+["zorganizować","\u043e\u0440\u0433\u0430\u043d\u0438\u0437\u043e\u0432\u0430\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["planować","\u043f\u043b\u0430\u043d\u0438\u0440\u043e\u0432\u0430\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["uczestniczyć","\u0443\u0447\u0430\u0441\u0442\u0432\u043e\u0432\u0430\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["wpływać","\u0432\u043b\u0438\u044f\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","C1"],
+["wywierać wpływ","\u043e\u043a\u0430\u0437\u044b\u0432\u0430\u0442\u044c \u0432\u043b\u0438\u044f\u043d\u0438\u0435","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","C1"],
+["zadbać","\u043f\u043e\u0437\u0430\u0431\u043e\u0442\u0438\u0442\u044c\u0441\u044f","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["zauważyć","\u0437\u0430\u043c\u0435\u0442\u0438\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["udawać","\u0434\u0435\u043b\u0430\u0442\u044c \u0432\u0438\u0434/\u043f\u0440\u0438\u0442\u0432\u043e\u0440\u044f\u0442\u044c\u0441\u044f","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+["wątpić","\u0441\u043e\u043c\u043d\u0435\u0432\u0430\u0442\u044c\u0441\u044f","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","C1"],
+["przyznać się","\u043f\u0440\u0438\u0437\u043d\u0430\u0442\u044c\u0441\u044f","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","B2"],
+// ГЛАГОЛЫ C1
+["narzucić","\u043d\u0430\u0432\u044f\u0437\u0430\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","C1"],
+["zmodyfikować","\u043c\u043e\u0434\u0438\u0444\u0438\u0446\u0438\u0440\u043e\u0432\u0430\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","C1"],
+["wdrożyć","\u0432\u043d\u0435\u0434\u0440\u0438\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","C1"],
+["zobowiązać się","\u043e\u0431\u044f\u0437\u0430\u0442\u044c\u0441\u044f","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","C1"],
+["sformułować","\u0441\u0444\u043e\u0440\u043c\u0443\u043b\u0438\u0440\u043e\u0432\u0430\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","C1"],
+["wypracować","\u0432\u044b\u0440\u0430\u0431\u043e\u0442\u0430\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","C1"],
+["odzwierciedlać","\u043e\u0442\u0440\u0430\u0436\u0430\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","C1"],
+["uwzględnić","\u0443\u0447\u0435\u0441\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","C1"],
+["umożliwić","\u0434\u0430\u0442\u044c \u0432\u043e\u0437\u043c\u043e\u0436\u043d\u043e\u0441\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","C1"],
+["zinterpretować","\u0438\u043d\u0442\u0435\u0440\u043f\u0440\u0435\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","C1"],
+["wyeliminować","\u0443\u0441\u0442\u0440\u0430\u043d\u0438\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","C1"],
+["współpracować","\u0441\u043e\u0442\u0440\u0443\u0434\u043d\u0438\u0447\u0430\u0442\u044c","\u0433\u043b\u0430\u0433\u043e\u043b\u044b","C1"],
+// ПРИЛАГАТЕЛЬНЫЕ B2
+["skomplikowany","\u0441\u043b\u043e\u0436\u043d\u044b\u0439/\u0437\u0430\u043f\u0443\u0442\u0430\u043d\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","B2"],
+["oczywisty","\u043e\u0447\u0435\u0432\u0438\u0434\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","B2"],
+["dokładny","\u0442\u043e\u0447\u043d\u044b\u0439/\u043f\u043e\u0434\u0440\u043e\u0431\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","B2"],
+["odpowiedni","\u043f\u043e\u0434\u0445\u043e\u0434\u044f\u0449\u0438\u0439/\u0441\u043e\u043e\u0442\u0432\u0435\u0442\u0441\u0442\u0432\u0443\u044e\u0449\u0438\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","B2"],
+["wystarczający","\u0434\u043e\u0441\u0442\u0430\u0442\u043e\u0447\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","B2"],
+["niezwykły","\u043d\u0435\u043e\u0431\u044b\u0447\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","B2"],
+["poważny","\u0441\u0435\u0440\u044c\u0451\u0437\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","B2"],
+["skuteczny","\u044d\u0444\u0444\u0435\u043a\u0442\u0438\u0432\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","B2"],
+["istotny","\u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0435\u043d\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","B2"],
+["zaskakujący","\u0443\u0434\u0438\u0432\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","B2"],
+["wyjątkowy","\u0438\u0441\u043a\u043b\u044e\u0447\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","B2"],
+["typowy","\u0442\u0438\u043f\u0438\u0447\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","B2"],
+["zdolny","\u0441\u043f\u043e\u0441\u043e\u0431\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","B2"],
+["odpowiedzialny","\u043e\u0442\u0432\u0435\u0442\u0441\u0442\u0432\u0435\u043d\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","B2"],
+["pewny siebie","\u0443\u0432\u0435\u0440\u0435\u043d\u043d\u044b\u0439 \u0432 \u0441\u0435\u0431\u0435","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","B2"],
+// ПРИЛАГАТЕЛЬНЫЕ C1
+["niejednoznaczny","\u043d\u0435\u043e\u0434\u043d\u043e\u0437\u043d\u0430\u0447\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","C1"],
+["kontrowersyjny","\u0441\u043f\u043e\u0440\u043d\u044b\u0439/\u043a\u043e\u043d\u0442\u0440\u043e\u0432\u0435\u0440\u0441\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","C1"],
+["przełomowy","\u043f\u0440\u043e\u0440\u044b\u0432\u043d\u043e\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","C1"],
+["dwuznaczny","\u0434\u0432\u0443\u0441\u043c\u044b\u0441\u043b\u0435\u043d\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","C1"],
+["nieunikniony","\u043d\u0435\u0438\u0437\u0431\u0435\u0436\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","C1"],
+["wyrafinowany","\u0443\u0442\u043e\u043d\u0447\u0451\u043d\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","C1"],
+["kompleksowy","\u043a\u043e\u043c\u043f\u043b\u0435\u043a\u0441\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","C1"],
+["gruntowny","\u043e\u0441\u043d\u043e\u0432\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","C1"],
+["niespójny","\u043d\u0435\u043f\u043e\u0441\u043b\u0435\u0434\u043e\u0432\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","C1"],
+// НАРЕЧИЯ
+["jednak","\u043e\u0434\u043d\u0430\u043a\u043e","\u043d\u0430\u0440\u0435\u0447\u0438\u044f","B2"],
+["natomiast","\u0432 \u0442\u043e \u0432\u0440\u0435\u043c\u044f \u043a\u0430\u043a/\u0442\u043e\u0433\u0434\u0430 \u043a\u0430\u043a","\u043d\u0430\u0440\u0435\u0447\u0438\u044f","B2"],
+["ponadto","\u043a\u0440\u043e\u043c\u0435 \u0442\u043e\u0433\u043e","\u043d\u0430\u0440\u0435\u0447\u0438\u044f","B2"],
+["przede wszystkim","\u043f\u0440\u0435\u0436\u0434\u0435 \u0432\u0441\u0435\u0433\u043e","\u043d\u0430\u0440\u0435\u0447\u0438\u044f","B2"],
+["ogólnie rzecz biorąc","\u0432 \u0446\u0435\u043b\u043e\u043c","\u043d\u0430\u0440\u0435\u0447\u0438\u044f","B2"],
+["innymi słowy","\u0434\u0440\u0443\u0433\u0438\u043c\u0438 \u0441\u043b\u043e\u0432\u0430\u043c\u0438","\u043d\u0430\u0440\u0435\u0447\u0438\u044f","B2"],
+["z drugiej strony","\u0441 \u0434\u0440\u0443\u0433\u043e\u0439 \u0441\u0442\u043e\u0440\u043e\u043d\u044b","\u043d\u0430\u0440\u0435\u0447\u0438\u044f","B2"],
+["mimo wszystko","\u043d\u0435\u0441\u043c\u043e\u0442\u0440\u044f \u043d\u0430 \u0432\u0441\u0451","\u043d\u0430\u0440\u0435\u0447\u0438\u044f","B2"],
+["zasadniczo","\u0432 \u043f\u0440\u0438\u043d\u0446\u0438\u043f\u0435/\u043f\u043e \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443","\u043d\u0430\u0440\u0435\u0447\u0438\u044f","C1"],
+["de facto","\u0434\u0435-\u0444\u0430\u043a\u0442\u043e","\u043d\u0430\u0440\u0435\u0447\u0438\u044f","C1"],
+["niemal","\u043f\u043e\u0447\u0442\u0438","\u043d\u0430\u0440\u0435\u0447\u0438\u044f","B2"],
+["coraz","\u0432\u0441\u0451 \u0431\u043e\u043b\u044c\u0448\u0435","\u043d\u0430\u0440\u0435\u0447\u0438\u044f","B2"],
+["wręcz","\u0431\u0443\u043a\u0432\u0430\u043b\u044c\u043d\u043e/\u043f\u0440\u044f\u043c\u043e-\u0442\u0430\u043a\u0438","\u043d\u0430\u0440\u0435\u0447\u0438\u044f","C1"],
+["rzekomo","\u044f\u043a\u043e\u0431\u044b","\u043d\u0430\u0440\u0435\u0447\u0438\u044f","C1"],
+["z pewnością","\u043d\u0435\u0441\u043e\u043c\u043d\u0435\u043d\u043d\u043e","\u043d\u0430\u0440\u0435\u0447\u0438\u044f","B2"],
+// ЧАСТИЦЫ И ФРАЗЫ
+["niestety","\u043a \u0441\u043e\u0436\u0430\u043b\u0435\u043d\u0438\u044e","\u0447\u0430\u0441\u0442\u0438\u0446\u044b","B2"],
+["na szczęście","\u043a \u0441\u0447\u0430\u0441\u0442\u044c\u044e","\u0447\u0430\u0441\u0442\u0438\u0446\u044b","B2"],
+["oczywiście","\u043a\u043e\u043d\u0435\u0447\u043d\u043e","\u0447\u0430\u0441\u0442\u0438\u0446\u044b","B2"],
+["właśnie","\u0438\u043c\u0435\u043d\u043d\u043e/\u043a\u0430\u043a \u0440\u0430\u0437","\u0447\u0430\u0441\u0442\u0438\u0446\u044b","B2"],
+["chyba","\u043d\u0430\u0432\u0435\u0440\u043d\u043e\u0435/\u043a\u0430\u0436\u0435\u0442\u0441\u044f","\u0447\u0430\u0441\u0442\u0438\u0446\u044b","B2"],
+["bodaj","\u0445\u043e\u0442\u044c \u0431\u044b/\u043f\u043e\u0436\u0430\u043b\u0443\u0439","\u0447\u0430\u0441\u0442\u0438\u0446\u044b","C1"],
+["owszem","\u0431\u0435\u0437\u0443\u0441\u043b\u043e\u0432\u043d\u043e/\u0434\u0430","\u0447\u0430\u0441\u0442\u0438\u0446\u044b","C1"],
+["ależ","\u043d\u0443 \u0447\u0442\u043e \u0432\u044b/\u043a\u0430\u043a \u0436\u0435","\u0447\u0430\u0441\u0442\u0438\u0446\u044b","C1"],
+["bynajmniej","\u043e\u0442\u043d\u044e\u0434\u044c","\u0447\u0430\u0441\u0442\u0438\u0446\u044b","C1"],
+["zatem","\u0438\u0442\u0430\u043a/\u0441\u043b\u0435\u0434\u043e\u0432\u0430\u0442\u0435\u043b\u044c\u043d\u043e","\u0447\u0430\u0441\u0442\u0438\u0446\u044b","B2"],
+// ФРАЗЫ ДЛЯ РАЗГОВОРА
+["Nie chodzi mi o to","\u042f \u043d\u0435 \u0442\u043e \u0438\u043c\u0435\u044e \u0432 \u0432\u0438\u0434\u0443","\u0444\u0440\u0430\u0437\u044b","B2"],
+["Masz rację","\u0422\u044b \u043f\u0440\u0430\u0432/\u043f\u0440\u0430\u0432\u0430","\u0444\u0440\u0430\u0437\u044b","B2"],
+["Co masz na myśli?","\u0427\u0442\u043e \u0442\u044b \u0438\u043c\u0435\u0435\u0448\u044c \u0432 \u0432\u0438\u0434\u0443?","\u0444\u0440\u0430\u0437\u044b","B2"],
+["Daj spokój!","\u0411\u0440\u043e\u0441\u044c! / \u041e\u0441\u0442\u0430\u0432\u044c \u044d\u0442\u043e!","\u0444\u0440\u0430\u0437\u044b","B2"],
+["O co chodzi?","\u0412 \u0447\u0451\u043c \u0434\u0435\u043b\u043e?","\u0444\u0440\u0430\u0437\u044b","B2"],
+["Wszystko jedno","\u0412\u0441\u0451 \u0440\u0430\u0432\u043d\u043e","\u0444\u0440\u0430\u0437\u044b","B2"],
+["Mam dość","\u041c\u043d\u0435 \u0445\u0432\u0430\u0442\u0438\u0442 / \u042f \u0443\u0441\u0442\u0430\u043b(\u0430)","\u0444\u0440\u0430\u0437\u044b","B2"],
+["To mi odpowiada","\u042d\u0442\u043e \u043c\u043d\u0435 \u043f\u043e\u0434\u0445\u043e\u0434\u0438\u0442","\u0444\u0440\u0430\u0437\u044b","B2"],
+["Nie ma mowy","\u041d\u0435 \u043c\u043e\u0436\u0435\u0442 \u0431\u044b\u0442\u044c \u0440\u0435\u0447\u0438","\u0444\u0440\u0430\u0437\u044b","B2"],
+["Jak to możliwe?","\u041a\u0430\u043a \u044d\u0442\u043e \u0432\u043e\u0437\u043c\u043e\u0436\u043d\u043e?","\u0444\u0440\u0430\u0437\u044b","B2"],
+["Zgadzam się","\u042f \u0441\u043e\u0433\u043b\u0430\u0441\u0435\u043d/\u0441\u043e\u0433\u043b\u0430\u0441\u043d\u0430","\u0444\u0440\u0430\u0437\u044b","B2"],
+["Nie zgadzam się","\u042f \u043d\u0435 \u0441\u043e\u0433\u043b\u0430\u0441\u0435\u043d/\u0441\u043e\u0433\u043b\u0430\u0441\u043d\u0430","\u0444\u0440\u0430\u0437\u044b","B2"],
+["Powiem ci jedno","\u0421\u043a\u0430\u0436\u0443 \u0442\u0435\u0431\u0435 \u043e\u0434\u043d\u043e","\u0444\u0440\u0430\u0437\u044b","B2"],
+["Nie spodziewałem się","\u042f \u043d\u0435 \u043e\u0436\u0438\u0434\u0430\u043b","\u0444\u0440\u0430\u0437\u044b","B2"],
+["Biorąc pod uwagę","\u041f\u0440\u0438\u043d\u0438\u043c\u0430\u044f \u0432\u043e \u0432\u043d\u0438\u043c\u0430\u043d\u0438\u0435","\u0444\u0440\u0430\u0437\u044b","C1"],
+["Na co dzień","\u0412 \u043f\u043e\u0432\u0441\u0435\u0434\u043d\u0435\u0432\u043d\u043e\u0439 \u0436\u0438\u0437\u043d\u0438","\u0444\u0440\u0430\u0437\u044b","B2"],
+["Z perspektywy czasu","\u0420\u0435\u0442\u0440\u043e\u0441\u043f\u0435\u043a\u0442\u0438\u0432\u043d\u043e","\u0444\u0440\u0430\u0437\u044b","C1"],
+["Nie bez powodu","\u041d\u0435 \u0431\u0435\u0437 \u043f\u0440\u0438\u0447\u0438\u043d\u044b","\u0444\u0440\u0430\u0437\u044b","C1"],
+["Warto zaznaczyć","\u0421\u0442\u043e\u0438\u0442 \u043e\u0442\u043c\u0435\u0442\u0438\u0442\u044c","\u0444\u0440\u0430\u0437\u044b","C1"],
+["Trudno powiedzieć","\u0422\u0440\u0443\u0434\u043d\u043e \u0441\u043a\u0430\u0437\u0430\u0442\u044c","\u0444\u0440\u0430\u0437\u044b","B2"],
+// ПРИРОДА
+["pogoda","\u043f\u043e\u0433\u043e\u0434\u0430","\u043f\u0440\u0438\u0440\u043e\u0434\u0430","B2"],
+["temperatura","\u0442\u0435\u043c\u043f\u0435\u0440\u0430\u0442\u0443\u0440\u0430","\u043f\u0440\u0438\u0440\u043e\u0434\u0430","B2"],
+["deszcz","\u0434\u043e\u0436\u0434\u044c","\u043f\u0440\u0438\u0440\u043e\u0434\u0430","B2"],
+["śnieg","\u0441\u043d\u0435\u0433","\u043f\u0440\u0438\u0440\u043e\u0434\u0430","B2"],
+["wiatr","\u0432\u0435\u0442\u0435\u0440","\u043f\u0440\u0438\u0440\u043e\u0434\u0430","B2"],
+["burza","\u0433\u0440\u043e\u0437\u0430","\u043f\u0440\u0438\u0440\u043e\u0434\u0430","B2"],
+["rzeka","\u0440\u0435\u043a\u0430","\u043f\u0440\u0438\u0440\u043e\u0434\u0430","B2"],
+["morze","\u043c\u043e\u0440\u0435","\u043f\u0440\u0438\u0440\u043e\u0434\u0430","B2"],
+["góry","\u0433\u043e\u0440\u044b","\u043f\u0440\u0438\u0440\u043e\u0434\u0430","B2"],
+["las","\u043b\u0435\u0441","\u043f\u0440\u0438\u0440\u043e\u0434\u0430","B2"],
+["pole","\u043f\u043e\u043b\u0435","\u043f\u0440\u0438\u0440\u043e\u0434\u0430","B2"],
+["ziemia","\u0437\u0435\u043c\u043b\u044f","\u043f\u0440\u0438\u0440\u043e\u0434\u0430","B2"],
+["roślina","\u0440\u0430\u0441\u0442\u0435\u043d\u0438\u0435","\u043f\u0440\u0438\u0440\u043e\u0434\u0430","B2"],
+["zwierzę","\u0436\u0438\u0432\u043e\u0442\u043d\u043e\u0435","\u043f\u0440\u0438\u0440\u043e\u0434\u0430","B2"],
+["ptak","\u043f\u0442\u0438\u0446\u0430","\u043f\u0440\u0438\u0440\u043e\u0434\u0430","B2"],
+["klimat","\u043a\u043b\u0438\u043c\u0430\u0442","\u043f\u0440\u0438\u0440\u043e\u0434\u0430","C1"],
+["ekologia","\u044d\u043a\u043e\u043b\u043e\u0433\u0438\u044f","\u043f\u0440\u0438\u0440\u043e\u0434\u0430","C1"],
+["zrównoważony rozwój","\u0443\u0441\u0442\u043e\u0439\u0447\u0438\u0432\u043e\u0435 \u0440\u0430\u0437\u0432\u0438\u0442\u0438\u0435","\u043f\u0440\u0438\u0440\u043e\u0434\u0430","C1"],
+// ДОПОЛНИТЕЛЬНЫЕ ПОЛЕЗНЫЕ C1
+["wzajemny","\u0432\u0437\u0430\u0438\u043c\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","C1"],
+["jednolity","\u0435\u0434\u0438\u043d\u044b\u0439/\u043e\u0434\u043d\u043e\u0440\u043e\u0434\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","C1"],
+["obiektywny","\u043e\u0431\u044a\u0435\u043a\u0442\u0438\u0432\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","C1"],
+["subiektywny","\u0441\u0443\u0431\u044a\u0435\u043a\u0442\u0438\u0432\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","C1"],
+["szeroko pojęty","\u0448\u0438\u0440\u043e\u043a\u043e \u043f\u043e\u043d\u0438\u043c\u0430\u0435\u043c\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","C1"],
+["ścisły","\u0441\u0442\u0440\u043e\u0433\u0438\u0439/\u0442\u043e\u0447\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","C1"],
+["szczegółowy","\u043f\u043e\u0434\u0440\u043e\u0431\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","C1"],
+["aktualny","\u0430\u043a\u0442\u0443\u0430\u043b\u044c\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","B2"],
+["globalny","\u0433\u043b\u043e\u0431\u0430\u043b\u044c\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","B2"],
+["lokalny","\u043b\u043e\u043a\u0430\u043b\u044c\u043d\u044b\u0439","\u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435","B2"],
+// СЛЕНГ (метки отдельно — всё будет в отдельной секции тоже)
+["spoko","\u043d\u043e\u0440\u043c / \u0432\u0441\u0451 \u043e\u043a","\u0441\u043b\u0435\u043d\u0433","slang"],
+["git","\u043e\u0442\u043b\u0438\u0447\u043d\u043e/\u043a\u043b\u0430\u0441\u0441","\u0441\u043b\u0435\u043d\u0433","slang"],
+["nara","\u043f\u043e\u043a\u0430","\u0441\u043b\u0435\u043d\u0433","slang"],
+["elo","\u043f\u0440\u0438\u0432\u0435\u0442 (\u043c\u043e\u043b.\u044f\u0437.)","\u0441\u043b\u0435\u043d\u0433","slang"],
+["ziom","\u043f\u0440\u0438\u044f\u0442\u0435\u043b\u044c/\u0447\u0443\u0432\u0430\u043a","\u0441\u043b\u0435\u043d\u0433","slang"],
+["kumpel","\u043f\u0440\u0438\u044f\u0442\u0435\u043b\u044c","\u0441\u043b\u0435\u043d\u0433","slang"],
+["zajebisty","\u043a\u0440\u0443\u0442\u043e\u0439 (\u0433\u0440\u0443\u0431.)","\u0441\u043b\u0435\u043d\u0433","slang"],
+["odlotowy","\u043a\u0440\u0443\u0442\u043e\u0439/\u043a\u043b\u0451\u0432\u044b\u0439","\u0441\u043b\u0435\u043d\u0433","slang"],
+["ogarnąć","\u0440\u0430\u0437\u043e\u0431\u0440\u0430\u0442\u044c\u0441\u044f/\u0441\u043e\u0431\u0440\u0430\u0442\u044c\u0441\u044f","\u0441\u043b\u0435\u043d\u0433","slang"],
+["ogarniać","\u0441\u043f\u0440\u0430\u0432\u043b\u044f\u0442\u044c\u0441\u044f/\u0440\u0430\u0437\u0431\u0438\u0440\u0430\u0442\u044c\u0441\u044f","\u0441\u043b\u0435\u043d\u0433","slang"],
+["luzak","\u0440\u0430\u0441\u0441\u043b\u0430\u0431\u043b\u0435\u043d\u043d\u044b\u0439 \u0447\u0435\u043b\u043e\u0432\u0435\u043a","\u0441\u043b\u0435\u043d\u0433","slang"],
+["luzować","\u0440\u0430\u0441\u0441\u043b\u0430\u0431\u043b\u044f\u0442\u044c\u0441\u044f","\u0441\u043b\u0435\u043d\u0433","slang"],
+["imprezować","\u0442\u0443\u0441\u043e\u0432\u0430\u0442\u044c\u0441\u044f","\u0441\u043b\u0435\u043d\u0433","slang"],
+["impreza","\u0432\u0435\u0447\u0435\u0440\u0438\u043d\u043a\u0430/\u0442\u0443\u0441\u043e\u0432\u043a\u0430","\u0441\u043b\u0435\u043d\u0433","slang"],
+["kac","\u043f\u043e\u0445\u043c\u0435\u043b\u044c\u0435","\u0441\u043b\u0435\u043d\u0433","slang"],
+["walnąć","\u0432\u0440\u0435\u0437\u0430\u0442\u044c/\u0432\u044b\u043f\u0438\u0442\u044c","\u0441\u043b\u0435\u043d\u0433","slang"],
+["bekowy","\u0441\u043c\u0435\u0448\u043d\u043e\u0439/\u0443\u0433\u0430\u0440\u043d\u044b\u0439","\u0441\u043b\u0435\u043d\u0433","slang"],
+["smutaski","\u0433\u0440\u0443\u0441\u0442\u043d\u044b\u0435 \u0441\u043c\u0430\u0439\u043b\u0438\u043a\u0438 / \u0443\u043d\u044b\u043b\u044b\u0439","\u0441\u043b\u0435\u043d\u0433","slang"],
+["masakra","\u0436\u0435\u0441\u0442\u044c/\u043a\u043e\u0448\u043c\u0430\u0440","\u0441\u043b\u0435\u043d\u0433","slang"],
+["niezły ubaw","\u043d\u0435\u043f\u043b\u043e\u0445\u043e\u0439 \u0441\u043c\u0435\u0445/\u0443\u0433\u0430\u0440","\u0441\u043b\u0435\u043d\u0433","slang"],
+["co ty gadasz","\u0447\u0442\u043e \u0442\u044b \u043d\u0435\u0441\u0451\u0448\u044c","\u0441\u043b\u0435\u043d\u0433","slang"],
+["nie ogarnia","\u043d\u0435 \u0441\u043e\u043e\u0431\u0440\u0430\u0436\u0430\u0435\u0442","\u0441\u043b\u0435\u043d\u0433","slang"],
+["mieć fazę","\u0431\u044b\u0442\u044c \u0432 \u0443\u0434\u0430\u0440\u0435/\u0432 \u043a\u0430\u0439\u0444\u0435","\u0441\u043b\u0435\u043d\u0433","slang"],
+["nawijać","\u0431\u043e\u043b\u0442\u0430\u0442\u044c/\u0442\u0440\u0435\u0449\u0430\u0442\u044c","\u0441\u043b\u0435\u043d\u0433","slang"],
+["ogień","\u043e\u0433\u043e\u043d\u044c/\u043e\u0442\u043b\u0438\u0447\u043d\u043e","\u0441\u043b\u0435\u043d\u0433","slang"],
+["nara stary","\u043f\u043e\u043a\u0430, \u0441\u0442\u0430\u0440\u0438\u043a","\u0441\u043b\u0435\u043d\u0433","slang"],
+["luz blues","\u043f\u043e\u043b\u043d\u044b\u0439 \u0440\u0430\u0441\u0441\u043b\u0430\u0431","\u0441\u043b\u0435\u043d\u0433","slang"],
+["mega","\u043c\u0435\u0433\u0430/\u043e\u0447\u0435\u043d\u044c","\u0441\u043b\u0435\u043d\u0433","slang"],
+["full wypas","\u0432\u044b\u0441\u0448\u0438\u0439 \u043a\u043b\u0430\u0441\u0441","\u0441\u043b\u0435\u043d\u0433","slang"],
+["słabo","\u0441\u043b\u0430\u0431\u043e/\u043f\u043b\u043e\u0445\u043e","\u0441\u043b\u0435\u043d\u0433","slang"],
+["chill","\u0447\u0438\u043b/\u0441\u043f\u043e\u043a\u043e\u0439\u043d\u043e","\u0441\u043b\u0435\u043d\u0433","slang"],
+["wrzucić na luz","\u0437\u0430\u0431\u0438\u0442\u044c/\u0440\u0430\u0441\u0441\u043b\u0430\u0431\u0438\u0442\u044c\u0441\u044f","\u0441\u043b\u0435\u043d\u0433","slang"],
+["ale jazda","\u043d\u0443 \u0438 \u043f\u043e\u0435\u0437\u0434\u043a\u0430/\u043a\u0440\u0443\u0442\u044c","\u0441\u043b\u0435\u043d\u0433","slang"],
+["mamy to","\u0435\u0441\u0442\u044c! \u043f\u043e\u043b\u0443\u0447\u0438\u043b\u043e\u0441\u044c!","\u0441\u043b\u0435\u043d\u0433","slang"],
+["odpaść","\u043e\u0442\u043a\u043b\u044e\u0447\u0438\u0442\u044c\u0441\u044f/\u0443\u0441\u0442\u0430\u0442\u044c \u0434\u043e \u043f\u0440\u0435\u0434\u0435\u043b\u0430","\u0441\u043b\u0435\u043d\u0433","slang"],
+["zaiwanić","\u043f\u0430\u0445\u0430\u0442\u044c/\u0432\u043a\u0430\u043b\u044b\u0432\u0430\u0442\u044c","\u0441\u043b\u0435\u043d\u0433","slang"],
+["się nie da","\u043d\u0435\u0432\u043e\u0437\u043c\u043e\u0436\u043d\u043e (\u0440\u0430\u0437\u0433.)","\u0441\u043b\u0435\u043d\u0433","slang"],
+["nie ma bata","\u043d\u0438 \u0432 \u043a\u043e\u0435\u043c \u0441\u043b\u0443\u0447\u0430\u0435","\u0441\u043b\u0435\u043d\u0433","slang"],
+["o zgrozo","\u043e \u0443\u0436\u0430\u0441","\u0441\u043b\u0435\u043d\u0433","slang"],
+["kopara","\u0447\u0435\u043b\u044e\u0441\u0442\u044c (\u043e\u0442\u0432\u0438\u0441\u043b\u0430)","\u0441\u043b\u0435\u043d\u0433","slang"],
+["fajna sprawa","\u0445\u043e\u0440\u043e\u0448\u0435\u0435 \u0434\u0435\u043b\u043e","\u0441\u043b\u0435\u043d\u0433","slang"],
+["stary","\u0441\u0442\u0430\u0440\u0438\u043a (\u043e\u0431\u0440\u0430\u0449\u0435\u043d\u0438\u0435)","\u0441\u043b\u0435\u043d\u0433","slang"],
+["koleś","\u0447\u0443\u0432\u0430\u043a/\u043c\u0443\u0436\u0438\u043a","\u0441\u043b\u0435\u043d\u0433","slang"],
+["typek","\u0442\u0438\u043f/\u0447\u0443\u0432\u0430\u043a","\u0441\u043b\u0435\u043d\u0433","slang"],
+["czajnik","\u0442\u043e\u0440\u043c\u043e\u0437/\u0442\u0443\u043f\u0438\u0446\u0430 (\u0448\u0443\u0442\u043b.)","\u0441\u043b\u0435\u043d\u0433","slang"],
+["świr","\u043f\u0441\u0438\u0445/\u0447\u0443\u0434\u0430\u043a","\u0441\u043b\u0435\u043d\u0433","slang"],
+["kicha","\u043e\u0431\u043b\u043e\u043c/\u043d\u0435\u0443\u0434\u0430\u0447\u0430","\u0441\u043b\u0435\u043d\u0433","slang"],
+["klapa","\u043f\u0440\u043e\u0432\u0430\u043b/\u0444\u0438\u0430\u0441\u043a\u043e","\u0441\u043b\u0435\u043d\u0433","slang"],
+["wypad","\u0443\u0431\u0438\u0440\u0430\u0439\u0441\u044f / \u0432\u044b\u043b\u0430\u0437\u043a\u0430","\u0441\u043b\u0435\u043d\u0433","slang"],
+["nie pieprz","\u043d\u0435 \u0433\u043e\u0432\u043e\u0440\u0438 \u0447\u0443\u0448\u044c (\u0433\u0440\u0443\u0431.)","\u0441\u043b\u0435\u043d\u0433","slang"],
+["bez sensu","\u0431\u0435\u0441\u0441\u043c\u044b\u0441\u043b\u0435\u043d\u043d\u043e","\u0441\u043b\u0435\u043d\u0433","slang"],
+["totalnie","\u043f\u043e\u043b\u043d\u043e\u0441\u0442\u044c\u044e/\u0442\u043e\u0442\u0430\u043b\u044c\u043d\u043e","\u0441\u043b\u0435\u043d\u0433","slang"],
+["ekstra","\u0441\u0443\u043f\u0435\u0440/\u043e\u0442\u043b\u0438\u0447\u043d\u043e","\u0441\u043b\u0435\u043d\u0433","slang"],
+["luźno","\u0441\u0432\u043e\u0431\u043e\u0434\u043d\u043e/\u043d\u0435\u043d\u0430\u043f\u0440\u044f\u0436\u043d\u043e","\u0441\u043b\u0435\u043d\u0433","slang"],
+["obczajać","\u0440\u0430\u0437\u0433\u043b\u044f\u0434\u044b\u0432\u0430\u0442\u044c/\u0441\u043c\u043e\u0442\u0440\u0435\u0442\u044c","\u0441\u043b\u0435\u043d\u0433","slang"],
+["nakminić","\u043f\u0440\u0438\u0434\u0443\u043c\u0430\u0442\u044c/\u0434\u043e\u0439\u0442\u0438 \u0434\u043e \u0447\u0435\u0433\u043e-\u0442\u043e","\u0441\u043b\u0435\u043d\u0433","slang"],
+];
+
+// Обогатим примерами (subset)
+const EXAMPLES = {
+"poradzić sobie": "Poradziłem sobie z tym zadaniem. — \u042f \u0441\u043f\u0440\u0430\u0432\u0438\u043b\u0441\u044f \u0441 \u044d\u0442\u0438\u043c \u0437\u0430\u0434\u0430\u043d\u0438\u0435\u043c.",
+"przekonać": "Przekonałem go do zmiany zdania. — \u042f \u0443\u0431\u0435\u0434\u0438\u043b \u0435\u0433\u043e \u0438\u0437\u043c\u0435\u043d\u0438\u0442\u044c \u043c\u043d\u0435\u043d\u0438\u0435.",
+"jednak": "Chciałem pomóc, jednak nie miałem czasu. — \u042f \u0445\u043e\u0442\u0435\u043b \u043f\u043e\u043c\u043e\u0447\u044c, \u043e\u0434\u043d\u0430\u043a\u043e \u043d\u0435 \u0431\u044b\u043b\u043e \u0432\u0440\u0435\u043c\u0435\u043d\u0438.",
+"natomiast": "Ona lubi kawę, natomiast on woli herbatę. — \u041e\u043d\u0430 \u043b\u044e\u0431\u0438\u0442 \u043a\u043e\u0444\u0435, \u0442\u043e\u0433\u0434\u0430 \u043a\u0430\u043a \u043e\u043d \u043f\u0440\u0435\u0434\u043f\u043e\u0447\u0438\u0442\u0430\u0435\u0442 \u0447\u0430\u0439.",
+"wdrożyć": "Firma wdroży nowy system. — \u041a\u043e\u043c\u043f\u0430\u043d\u0438\u044f \u0432\u043d\u0435\u0434\u0440\u0438\u0442 \u043d\u043e\u0432\u0443\u044e \u0441\u0438\u0441\u0442\u0435\u043c\u0443.",
+"spoko": "Spoko, nie przejmuj się! — \u041d\u043e\u0440\u043c, \u043d\u0435 \u043f\u0435\u0440\u0435\u0436\u0438\u0432\u0430\u0439!",
+"ogarnąć": "Muszę to ogarnąć do jutra. — \u041c\u043d\u0435 \u043d\u0443\u0436\u043d\u043e \u0440\u0430\u0437\u043e\u0431\u0440\u0430\u0442\u044c\u0441\u044f \u0441 \u044d\u0442\u0438\u043c \u043a \u0437\u0430\u0432\u0442\u0440\u0430\u0448\u043d\u0435\u043c\u0443 \u0434\u043d\u044e.",
+"masakra": "To była totalna masakra na egzaminie. — \u042d\u0442\u043e \u0431\u044b\u043b \u043f\u043e\u043b\u043d\u044b\u0439 \u043a\u043e\u0448\u043c\u0430\u0440 \u043d\u0430 \u044d\u043a\u0437\u0430\u043c\u0435\u043d\u0435.",
+"niestety": "Niestety, nie zdałem egzaminu. — \u041a \u0441\u043e\u0436\u0430\u043b\u0435\u043d\u0438\u044e, \u044f \u043d\u0435 \u0441\u0434\u0430\u043b \u044d\u043a\u0437\u0430\u043c\u0435\u043d.",
+"właśnie": "Właśnie o to chodzi! — \u0412\u043e\u0442 \u0438\u043c\u0435\u043d\u043d\u043e \u0432 \u044d\u0442\u043e\u043c \u0438 \u0434\u0435\u043b\u043e!",
+};
+
+// ══════════════════════════════════════════
+// ПРАВИЛА ГРАММАТИКИ
+// ══════════════════════════════════════════
+const RULES = [
+{title:"🔤 \u041f\u0430\u0434\u0435\u0436\u0438 (przypadki) — \u043e\u0431\u0437\u043e\u0440", content:`
+<p>\u0412 \u043f\u043e\u043b\u044c\u0441\u043a\u043e\u043c \u044f\u0437\u044b\u043a\u0435 <span class="hl">7 \u043f\u0430\u0434\u0435\u0436\u0435\u0439</span>. \u041a\u043b\u044e\u0447\u0435\u0432\u044b\u0435 \u0432\u043e\u043f\u0440\u043e\u0441\u044b:</p>
+<table>
+<tr><th>#</th><th>\u041f\u0430\u0434\u0435\u0436</th><th>\u0412\u043e\u043f\u0440\u043e\u0441</th><th>\u041f\u0440\u0438\u043c\u0435\u0440</th></tr>
+<tr><td>1</td><td>Mianownik (\u0418\u043c\u0435\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0439)</td><td>Kto? Co?</td><td><span class="hl">Pies</span> śpi.</td></tr>
+<tr><td>2</td><td>Dopełniacz (\u0420\u043e\u0434\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0439)</td><td>Kogo? Czego?</td><td>Nie ma <span class="hl">psa</span>.</td></tr>
+<tr><td>3</td><td>Celownik (\u0414\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0439)</td><td>Komu? Czemu?</td><td>Daję <span class="hl">psu</span>.</td></tr>
+<tr><td>4</td><td>Biernik (\u0412\u0438\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0439)</td><td>Kogo? Co?</td><td>Widzę <span class="hl">psa</span>.</td></tr>
+<tr><td>5</td><td>Narzędnik (\u0422\u0432\u043e\u0440\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0439)</td><td>Kim? Czym?</td><td>Idę z <span class="hl">psem</span>.</td></tr>
+<tr><td>6</td><td>Miejscownik (\u041f\u0440\u0435\u0434\u043b\u043e\u0436\u043d\u044b\u0439)</td><td>O kim? O czym?</td><td>Mówię o <span class="hl">psie</span>.</td></tr>
+<tr><td>7</td><td>Wołacz (\u0417\u0432\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0439)</td><td>(\u043e\u0431\u0440\u0430\u0449\u0435\u043d\u0438\u0435)</td><td><span class="hl">Psie</span>!</td></tr>
+</table>
+<p style="margin-top:10px"><span class="hl3">\u041b\u0430\u0439\u0444\u0445\u0430\u043a B2+:</span> \u0421\u0430\u043c\u044b\u0439 \u0447\u0430\u0441\u0442\u044b\u0439 — <span class="hl2">Dopełniacz (\u0440\u043e\u0434\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0439)</span>: \u043f\u043e\u0441\u043b\u0435 \u043e\u0442\u0440\u0438\u0446\u0430\u043d\u0438\u044f «nie», \u043f\u043e\u0441\u043b\u0435 \u0447\u0438\u0441\u043b\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0445 5+, \u043f\u043e\u0441\u043b\u0435 \u043c\u043d\u043e\u0433\u0438\u0445 \u043f\u0440\u0435\u0434\u043b\u043e\u0433\u043e\u0432 (bez, dla, od, do, z, u, po + \u0437\u043d\u0430\u0447\u0435\u043d\u0438\u0435 «\u043f\u043e\u0441\u043b\u0435»).</p>
+`},
+{title:"⏱ \u0412\u0438\u0434 \u0433\u043b\u0430\u0433\u043e\u043b\u0430 (aspekt) — \u043a\u043b\u044e\u0447\u0435\u0432\u043e\u0435 \u043e\u0442\u043b\u0438\u0447\u0438\u0435", content:`
+<p>\u041f\u043e\u043b\u044c\u0441\u043a\u0438\u0435 \u0433\u043b\u0430\u0433\u043e\u043b\u044b \u0438\u043c\u0435\u044e\u0442 <span class="hl">\u043d\u0435\u0441\u043e\u0432\u0435\u0440\u0448\u0435\u043d\u043d\u044b\u0439 (\u041d\u0421\u0412)</span> \u0438 <span class="hl2">\u0441\u043e\u0432\u0435\u0440\u0448\u0435\u043d\u043d\u044b\u0439 \u0432\u0438\u0434 (\u0421\u0412)</span>.</p>
+<table>
+<tr><th>\u041d\u0421\u0412 (\u043d\u0435\u0441\u043e\u0432.)</th><th>\u0421\u0412 (\u0441\u043e\u0432.)</th><th>\u0420\u0430\u0437\u043d\u0438\u0446\u0430</th></tr>
+<tr><td>pisać</td><td>napisać</td><td>\u043f\u0438\u0441\u0430\u0442\u044c / \u043d\u0430\u043f\u0438\u0441\u0430\u0442\u044c</td></tr>
+<tr><td>czytać</td><td>przeczytać</td><td>\u0447\u0438\u0442\u0430\u0442\u044c / \u043f\u0440\u043e\u0447\u0438\u0442\u0430\u0442\u044c</td></tr>
+<tr><td>mówić</td><td>powiedzieć</td><td>\u0433\u043e\u0432\u043e\u0440\u0438\u0442\u044c / \u0441\u043a\u0430\u0437\u0430\u0442\u044c</td></tr>
+<tr><td>robić</td><td>zrobić</td><td>\u0434\u0435\u043b\u0430\u0442\u044c / \u0441\u0434\u0435\u043b\u0430\u0442\u044c</td></tr>
+<tr><td>kupować</td><td>kupić</td><td>\u043f\u043e\u043a\u0443\u043f\u0430\u0442\u044c / \u043a\u0443\u043f\u0438\u0442\u044c</td></tr>
+</table>
+<div class="example"><div class="pl">Pisałem list godzinę. (\u041d\u0421\u0412)</div><div class="tr">\u042f \u043f\u0438\u0441\u0430\u043b \u043f\u0438\u0441\u044c\u043c\u043e \u0447\u0430\u0441. (\u043f\u0440\u043e\u0446\u0435\u0441\u0441)</div></div>
+<div class="example"><div class="pl">Napisałem list. (\u0421\u0412)</div><div class="tr">\u042f \u043d\u0430\u043f\u0438\u0441\u0430\u043b \u043f\u0438\u0441\u044c\u043c\u043e. (\u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442)</div></div>
+<p style="margin-top:8px"><span class="hl3">\u041f\u0440\u0430\u0432\u0438\u043b\u043e:</span> \u0421\u0412 \u043d\u0435 \u0438\u043c\u0435\u0435\u0442 \u0444\u043e\u0440\u043c\u044b \u043d\u0430\u0441\u0442\u043e\u044f\u0449\u0435\u0433\u043e \u0432\u0440\u0435\u043c\u0435\u043d\u0438 — \u0442\u043e\u043b\u044c\u043a\u043e \u043f\u0440\u043e\u0448\u0435\u0434\u0448\u0435\u0435 \u0438 \u0431\u0443\u0434\u0443\u0449\u0435\u0435!</p>
+`},
+{title:"📝 \u0420\u043e\u0434\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0439 \u043f\u0430\u0434\u0435\u0436 \u043f\u043e\u0441\u043b\u0435 \u043e\u0442\u0440\u0438\u0446\u0430\u043d\u0438\u044f", content:`
+<p>\u041f\u043e\u0441\u043b\u0435 <span class="hl">nie</span> \u0433\u043b\u0430\u0433\u043e\u043b \u0442\u0440\u0435\u0431\u0443\u0435\u0442 <span class="hl2">\u0440\u043e\u0434\u0438\u0442\u0435\u043b\u044c\u043d\u043e\u0433\u043e \u043f\u0430\u0434\u0435\u0436\u0430 (dopełniacz)</span> \u0432\u043c\u0435\u0441\u0442\u043e \u0438\u043c\u0435\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u043e\u0433\u043e/\u0432\u0438\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u043e\u0433\u043e:</p>
+<div class="example"><div class="pl">Mam <span class="hl2">samochód</span> → Nie mam <span class="hl">samochodu</span></div><div class="tr">\u0423 \u043c\u0435\u043d\u044f \u0435\u0441\u0442\u044c \u043c\u0430\u0448\u0438\u043d\u0430 → \u0423 \u043c\u0435\u043d\u044f \u043d\u0435\u0442 \u043c\u0430\u0448\u0438\u043d\u044b</div></div>
+<div class="example"><div class="pl">Piję <span class="hl2">kawę</span> → Nie piję <span class="hl">kawy</span></div><div class="tr">\u042f \u043f\u044c\u044e \u043a\u043e\u0444\u0435 → \u042f \u043d\u0435 \u043f\u044c\u044e \u043a\u043e\u0444\u0435</div></div>
+<div class="example"><div class="pl">Widzę <span class="hl2">psa</span> → Nie widzę <span class="hl">psa</span></div><div class="tr">\u042f \u0432\u0438\u0436\u0443 \u043f\u0441\u0430 → \u042f \u043d\u0435 \u0432\u0438\u0436\u0443 \u043f\u0441\u0430</div></div>
+<p style="margin-top:8px">\u041e\u043a\u043e\u043d\u0447\u0430\u043d\u0438\u044f \u0432 Dopełniacz: \u043c\u0443\u0436.\u043d\u0435\u043e\u0434\u0443\u0448. <span class="hl">-a/-u</span>, \u043c\u0443\u0436.\u043e\u0434\u0443\u0448. <span class="hl">-a</span>, \u0436\u0435\u043d. <span class="hl">-y/-i</span>, \u0441\u0440. <span class="hl">-a</span>.</p>
+`},
+{title:"🔢 \u0427\u0438\u0441\u043b\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0435 \u0438 \u043f\u0430\u0434\u0435\u0436\u0438", content:`
+<p>\u041f\u043e\u0441\u043b\u0435 \u0447\u0438\u0441\u043b\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0445 \u043f\u0430\u0434\u0435\u0436 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0438\u0442\u0435\u043b\u044c\u043d\u043e\u0433\u043e \u043c\u0435\u043d\u044f\u0435\u0442\u0441\u044f:</p>
+<table>
+<tr><th>\u0427\u0438\u0441\u043b.</th><th>\u0424\u043e\u0440\u043c\u0430</th><th>\u041f\u0440\u0438\u043c\u0435\u0440</th></tr>
+<tr><td>1</td><td>Mianownik \u0435\u0434.\u0447.</td><td>jeden <span class="hl">pies</span></td></tr>
+<tr><td>2-4</td><td>Mianownik \u043c\u043d.\u0447.</td><td>dwa <span class="hl">psy</span></td></tr>
+<tr><td>5+</td><td>Dopełniacz \u043c\u043d.\u0447.</td><td>pięć <span class="hl">psów</span></td></tr>
+<tr><td>11-19</td><td>Dopełniacz \u043c\u043d.\u0447.</td><td>piętnaście <span class="hl">psów</span></td></tr>
+<tr><td>21, 22-24</td><td>Mianownik \u043c\u043d.\u0447.</td><td>dwadzieścia dwa <span class="hl">psy</span></td></tr>
+</table>
+`},
+{title:"🏃 \u0414\u0432\u0438\u0436\u0435\u043d\u0438\u0435: iść, jechać \u0438 \u043f\u0440\u0438\u0441\u0442\u0430\u0432\u043a\u0438", content:`
+<p><span class="hl">iść</span> = \u0438\u0434\u0442\u0438 (\u043f\u0435\u0448\u043a\u043e\u043c), <span class="hl">jechać</span> = \u0435\u0445\u0430\u0442\u044c (\u0442\u0440\u0430\u043d\u0441\u043f\u043e\u0440\u0442)</p>
+<p style="margin-top:8px">\u041a\u043b\u044e\u0447\u0435\u0432\u044b\u0435 \u043f\u0440\u0438\u0441\u0442\u0430\u0432\u043a\u0438 \u043c\u0435\u043d\u044f\u044e\u0442 \u043d\u0430\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u0435:</p>
+<table>
+<tr><th>\u041f\u0440\u0438\u0441\u0442\u0430\u0432\u043a\u0430</th><th>\u0417\u043d\u0430\u0447\u0435\u043d\u0438\u0435</th><th>\u041f\u0440\u0438\u043c\u0435\u0440</th></tr>
+<tr><td>do-</td><td>\u0434\u043e / \u043f\u0440\u0438\u0439\u0442\u0438</td><td>dojść, dojechać</td></tr>
+<tr><td>przy-</td><td>\u043f\u0440\u0438\u0439\u0442\u0438 (\u043f\u0440\u0438\u0431\u044b\u0442\u044c)</td><td>przyjść, przyjechać</td></tr>
+<tr><td>po-</td><td>\u043f\u043e\u0439\u0442\u0438 (\u043d\u0430\u0447.)</td><td>pójść, pojechać</td></tr>
+<tr><td>wy-</td><td>\u0432\u044b\u0439\u0442\u0438 / \u0432\u044b\u0435\u0445\u0430\u0442\u044c</td><td>wyjść, wyjechać</td></tr>
+<tr><td>od-</td><td>\u043e\u0442\u043e\u0439\u0442\u0438 / \u0443\u0435\u0445\u0430\u0442\u044c</td><td>odejść, odjechać</td></tr>
+<tr><td>prze-</td><td>\u043f\u0435\u0440\u0435\u0439\u0442\u0438 / \u043f\u0440\u043e\u0435\u0445\u0430\u0442\u044c</td><td>przejść, przejechać</td></tr>
+<tr><td>za-</td><td>\u0437\u0430\u0439\u0442\u0438 / \u0437\u0430\u0435\u0445\u0430\u0442\u044c</td><td>zajść, zajechać</td></tr>
+</table>
+`},
+{title:"🎭 \u0423\u0441\u043b\u043e\u0432\u043d\u043e\u0435 \u043d\u0430\u043a\u043b\u043e\u043d\u0435\u043d\u0438\u0435 (tryb warunkowy)", content:`
+<p>\u041e\u0431\u0440\u0430\u0437\u0443\u0435\u0442\u0441\u044f: <span class="hl">\u0444\u043e\u0440\u043c\u0430 \u043f\u0440\u043e\u0448.\u0432\u0440. + by</span></p>
+<table>
+<tr><th>\u041b\u0438\u0446\u043e</th><th>\u041c\u0443\u0436\u0441\u043a\u043e\u0439 \u0440.</th><th>\u0416\u0435\u043d\u0441\u043a\u0438\u0439 \u0440.</th></tr>
+<tr><td>\u042f</td><td>zrobiłbym</td><td>zrobiłabym</td></tr>
+<tr><td>\u0422\u044b</td><td>zrobiłbyś</td><td>zrobiłabyś</td></tr>
+<tr><td>\u041e\u043d/\u041e\u043d\u0430</td><td>zrobiłby</td><td>zrobiłaby</td></tr>
+<tr><td>\u041c\u044b</td><td>zrobilibyśmy</td><td>zrobiłybyśmy</td></tr>
+<tr><td>\u0412\u044b</td><td>zrobilibyście</td><td>zrobiłybyście</td></tr>
+<tr><td>\u041e\u043d\u0438</td><td>zrobiliby</td><td>zrobiłyby</td></tr>
+</table>
+<div class="example"><div class="pl">Chciałbym to zobaczyć.</div><div class="tr">\u042f \u0431\u044b \u0445\u043e\u0442\u0435\u043b \u044d\u0442\u043e \u0443\u0432\u0438\u0434\u0435\u0442\u044c.</div></div>
+<div class="example"><div class="pl">Gdybym miał czas, pomógłbym.</div><div class="tr">\u0415\u0441\u043b\u0438 \u0431\u044b \u0443 \u043c\u0435\u043d\u044f \u0431\u044b\u043b\u043e \u0432\u0440\u0435\u043c\u044f, \u044f \u0431\u044b \u043f\u043e\u043c\u043e\u0433.</div></div>
+`},
+{title:"📦 \u041f\u0440\u0435\u0434\u043b\u043e\u0433\u0438 + \u043f\u0430\u0434\u0435\u0436 (must know)", content:`
+<table>
+<tr><th>\u041f\u0440\u0435\u0434\u043b\u043e\u0433</th><th>\u041f\u0430\u0434\u0435\u0436</th><th>\u0417\u043d\u0430\u0447\u0435\u043d\u0438\u0435</th></tr>
+<tr><td>do, bez, dla, od, z (\u043e\u0442\u043a\u0443\u0434\u0430), u</td><td>Dopełniacz</td><td>\u0434\u043e, \u0431\u0435\u0437, \u0434\u043b\u044f, \u043e\u0442, \u0438\u0437, \u0443</td></tr>
+<tr><td>ku, dzięki, wbrew</td><td>Celownik</td><td>\u043a, \u0431\u043b\u0430\u0433\u043e\u0434\u0430\u0440\u044f, \u0432\u043e\u043f\u0440\u0435\u043a\u0438</td></tr>
+<tr><td>przez, na (\u043a\u0443\u0434\u0430), w (\u043a\u0443\u0434\u0430), o (\u043f\u0440\u043e\u0441\u0438\u0442\u044c)</td><td>Biernik</td><td>\u0447\u0435\u0440\u0435\u0437, \u043d\u0430, \u0432, \u043e</td></tr>
+<tr><td>z (\u0441 \u043a\u0435\u043c), za, przed, między, nad, pod</td><td>Narzędnik</td><td>\u0441, \u0437\u0430, \u043f\u0435\u0440\u0435\u0434, \u043c\u0435\u0436\u0434\u0443, \u043d\u0430\u0434, \u043f\u043e\u0434</td></tr>
+<tr><td>w (\u0433\u0434\u0435), na (\u0433\u0434\u0435), o (\u0433\u043e\u0432\u043e\u0440\u0438\u0442\u044c), po, przy</td><td>Miejscownik</td><td>\u0432, \u043d\u0430, \u043e, \u043f\u043e, \u043f\u0440\u0438</td></tr>
+</table>
+<p style="margin-top:8px"><span class="hl3">\u0412\u0430\u0436\u043d\u043e:</span> <span class="hl">na / w</span> \u0431\u044b\u0432\u0430\u044e\u0442 \u0441 \u0434\u0432\u0443\u043c\u044f \u043f\u0430\u0434\u0435\u0436\u0430\u043c\u0438: <br>
+<em>Idę <span class="hl">na stację</span></em> (Biernik, \u043a\u0443\u0434\u0430) vs <em>Jestem <span class="hl">na stacji</span></em> (Miejscownik, \u0433\u0434\u0435)</p>
+`},
+{title:"🔄 \u0412\u043e\u0437\u0432\u0440\u0430\u0442\u043d\u044b\u0439 \u0433\u043b\u0430\u0433\u043e\u043b się", content:`
+<p><span class="hl">się</span> = «\u0441\u0435\u0431\u044f» / \u043c\u0430\u0440\u043a\u0435\u0440 \u0432\u043e\u0437\u0432\u0440\u0430\u0442\u043d\u043e\u0441\u0442\u0438. \u0421\u0442\u0430\u0432\u0438\u0442\u0441\u044f \u041d\u0415 \u0432\u0441\u0435\u0433\u0434\u0430 \u0441\u0440\u0430\u0437\u0443 \u043f\u043e\u0441\u043b\u0435 \u0433\u043b\u0430\u0433\u043e\u043b\u0430 — \u043c\u043e\u0436\u043d\u043e \u043e\u0442\u0434\u0435\u043b\u044f\u0442\u044c.</p>
+<div class="example"><div class="pl">Myję <span class="hl">się</span>. / Nie myję <span class="hl">się</span>.</div><div class="tr">\u042f \u043c\u043e\u044e\u0441\u044c. / \u042f \u043d\u0435 \u043c\u043e\u044e\u0441\u044c.</div></div>
+<div class="example"><div class="pl">Jak <span class="hl">się</span> masz?</div><div class="tr">\u041a\u0430\u043a \u0434\u0435\u043b\u0430? (\u0431\u0443\u043a\u0432\u0430\u043b\u044c\u043d\u043e: \u043a\u0430\u043a \u0442\u044b \u0441\u0435\u0431\u044f \u0438\u043c\u0435\u0435\u0448\u044c)</div></div>
+<p style="margin-top:8px">\u041d\u0435\u043f\u0435\u0440\u0435\u0445\u043e\u0434\u043d\u044b\u0435 \u0433\u043b\u0430\u0433\u043e\u043b\u044b: <span class="hl">bać się</span> (\u0431\u043e\u044f\u0442\u044c\u0441\u044f), <span class="hl">cieszyć się</span> (\u0440\u0430\u0434\u043e\u0432\u0430\u0442\u044c\u0441\u044f), <span class="hl">martwić się</span> (\u0431\u0435\u0441\u043f\u043e\u043a\u043e\u0438\u0442\u044c\u0441\u044f), <span class="hl">śmiać się</span> (\u0441\u043c\u0435\u044f\u0442\u044c\u0441\u044f).</p>
+`},
+{title:"💬 \u041f\u0440\u044f\u043c\u0430\u044f \u0438 \u043a\u043e\u0441\u0432\u0435\u043d\u043d\u0430\u044f \u0440\u0435\u0447\u044c", content:`
+<p>\u0412 \u043a\u043e\u0441\u0432\u0435\u043d\u043d\u043e\u0439 \u0440\u0435\u0447\u0438 \u0432\u0440\u0435\u043c\u044f <strong>\u043d\u0435 \u0441\u0434\u0432\u0438\u0433\u0430\u0435\u0442\u0441\u044f</strong> (\u0432 \u043e\u0442\u043b\u0438\u0447\u0438\u0435 \u043e\u0442 \u0430\u043d\u0433\u043b\u0438\u0439\u0441\u043a\u043e\u0433\u043e)!</p>
+<div class="example"><div class="pl">Powiedział: „Jestem zmęczony." → Powiedział, że jest zmęczony.</div><div class="tr">\u041e\u043d \u0441\u043a\u0430\u0437\u0430\u043b: «\u042f \u0443\u0441\u0442\u0430\u043b» → \u041e\u043d \u0441\u043a\u0430\u0437\u0430\u043b, \u0447\u0442\u043e \u0443\u0441\u0442\u0430\u043b.</div></div>
+<div class="example"><div class="pl">Zapytał: „Czy przyjdziesz?" → Zapytał, czy przyjdę.</div><div class="tr">\u041e\u043d \u0441\u043f\u0440\u043e\u0441\u0438\u043b: «\u041f\u0440\u0438\u0434\u0451\u0448\u044c?» → \u041e\u043d \u0441\u043f\u0440\u043e\u0441\u0438\u043b, \u043f\u0440\u0438\u0434\u0443 \u043b\u0438 \u044f.</div></div>
+`},
+{title:"📌 \u041f\u0440\u0435\u0432\u043e\u0441\u0445\u043e\u0434\u043d\u0430\u044f \u0438 \u0441\u0440\u0430\u0432\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u0430\u044f \u0441\u0442\u0435\u043f\u0435\u043d\u044c", content:`
+<table>
+<tr><th>\u041f\u0440\u0438\u043b.</th><th>\u0421\u0440\u0430\u0432\u043d. \u0441\u0442\u0435\u043f\u0435\u043d\u044c</th><th>\u041f\u0440\u0435\u0432\u043e\u0441\u0445. \u0441\u0442\u0435\u043f\u0435\u043d\u044c</th></tr>
+<tr><td>dobry (\u0445\u043e\u0440\u043e\u0448\u0438\u0439)</td><td>lepszy</td><td>najlepszy</td></tr>
+<tr><td>zły (\u043f\u043b\u043e\u0445\u043e\u0439)</td><td>gorszy</td><td>najgorszy</td></tr>
+<tr><td>duży (\u0431\u043e\u043b\u044c\u0448\u043e\u0439)</td><td>większy</td><td>największy</td></tr>
+<tr><td>mały (\u043c\u0430\u043b\u0435\u043d\u044c\u043a\u0438\u0439)</td><td>mniejszy</td><td>najmniejszy</td></tr>
+<tr><td>stary (\u0441\u0442\u0430\u0440\u044b\u0439)</td><td>starszy</td><td>najstarszy</td></tr>
+<tr><td>szybki (\u0431\u044b\u0441\u0442\u0440\u044b\u0439)</td><td>szybszy</td><td>najszybszy</td></tr>
+</table>
+<p style="margin-top:8px">\u0420\u0435\u0433\u0443\u043b\u044f\u0440\u043d\u0430\u044f \u0444\u043e\u0440\u043c\u0430: \u0434\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0441\u0443\u0444\u0444\u0438\u043a\u0441 <span class="hl">-szy / -iejszy</span> + <span class="hl">naj-</span> \u0434\u043b\u044f \u043f\u0440\u0435\u0432\u043e\u0441\u0445\u043e\u0434\u043d\u043e\u0439.</p>
+`},
+];
+
+// ══════════════════════════════════════════
+// ЛАЙФХАКИ
+// ══════════════════════════════════════════
+const HACKS = [
+{ico:"🆘", title:"\u0417\u0430\u0431\u044b\u043b \u0441\u043b\u043e\u0432\u043e? \u0418\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0439 \u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435!", text:"\u0415\u0441\u043b\u0438 \u043d\u0435 \u0437\u043d\u0430\u0435\u0448\u044c \u0442\u043e\u0447\u043d\u043e\u0435 \u0441\u043b\u043e\u0432\u043e, \u043e\u043f\u0438\u0448\u0438 \u0435\u0433\u043e. \u041f\u043e\u043b\u044f\u043a\u0438 \u043f\u043e\u0439\u043c\u0443\u0442 \u0438 \u0447\u0430\u0441\u0442\u043e \u0441\u0430\u043c\u0438 \u043f\u043e\u0434\u0441\u043a\u0430\u0436\u0443\u0442 \u0441\u043b\u043e\u0432\u043e.", ex:{pl:"To jest taka rzecz, którą używa się do... (\u044d\u0442\u043e \u0442\u0430\u043a\u0430\u044f \u0448\u0442\u0443\u043a\u0430, \u043a\u043e\u0442\u043e\u0440\u0443\u044e \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u044e\u0442 \u0434\u043b\u044f...)", tr:"→ \u0441\u043e\u0431\u0435\u0441\u0435\u0434\u043d\u0438\u043a \u043f\u043e\u0434\u0441\u043a\u0430\u0436\u0435\u0442 \u043d\u0443\u0436\u043d\u043e\u0435 \u0441\u043b\u043e\u0432\u043e"}},
+{ico:"🔤", title:"\u0417\u0430\u0431\u044b\u043b \u043f\u0430\u0434\u0435\u0436? \u0418\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0439 \u0438\u043c\u0435\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0439!", text:"\u0412 \u0440\u0430\u0437\u0433\u043e\u0432\u043e\u0440\u043d\u043e\u0439 \u0440\u0435\u0447\u0438 \u043f\u043e\u043b\u044c\u0441\u043a\u0438\u0435 \u043d\u043e\u0441\u0438\u0442\u0435\u043b\u0438 \u043d\u0435\u0440\u0435\u0434\u043a\u043e \u043f\u0440\u043e\u0449\u0430\u044e\u0442 \u043e\u0448\u0438\u0431\u043a\u0438 \u0432 \u043f\u0430\u0434\u0435\u0436\u0430\u0445. \u0421\u043a\u0430\u0436\u0438 \u0432 \u0438\u043c\u0435\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u043e\u043c — \u043f\u043e\u0439\u043c\u0443\u0442. \u0412\u0430\u0436\u043d\u0435\u0435 \u043e\u0448\u0438\u0431\u043a\u0430 \u0432 \u0432\u0438\u0434\u0435 \u0433\u043b\u0430\u0433\u043e\u043b\u0430 (\u041d\u0421\u0412/\u0421\u0412).", ex:{pl:"Nie mam pies (\u043e\u0448\u0438\u0431\u043a\u0430) → \u0432\u0441\u0451 \u0440\u0430\u0432\u043d\u043e \u043f\u043e\u0439\u043c\u0443\u0442", tr:"\u043f\u0440\u0430\u0432\u0438\u043b\u044c\u043d\u043e: Nie mam psa (\u0440\u043e\u0434\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0439)"}},
+{ico:"♻️", title:"\u0417\u0430\u0431\u044b\u043b \u043e\u043a\u043e\u043d\u0447\u0430\u043d\u0438\u0435? \u0423\u043f\u0440\u043e\u0449\u0430\u0439 \u043a\u043e\u043d\u0441\u0442\u0440\u0443\u043a\u0446\u0438\u044e!", text:"\u0412\u043c\u0435\u0441\u0442\u043e \u0441\u043b\u043e\u0436\u043d\u043e\u0433\u043e \u043f\u0430\u0434\u0435\u0436\u0430 \u043f\u0435\u0440\u0435\u0444\u043e\u0440\u043c\u0443\u043b\u0438\u0440\u0443\u0439 \u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u0435 \u0441 \u043a\u043e\u043d\u0441\u0442\u0440\u0443\u043a\u0446\u0438\u0435\u0439 «być» (\u0431\u044b\u0442\u044c) \u0438\u043b\u0438 «to jest» (\u044d\u0442\u043e \u0435\u0441\u0442\u044c).", ex:{pl:"To jest dla mój brat → To jest dla mojego brata", tr:"\u041f\u0435\u0440\u0435\u0441\u0442\u0440\u0430\u0445\u0443\u0439\u0441\u044f: «To jest prezent dla brata» (\u0431\u0435\u0437 \u043c\u0435\u0441\u0442\u043e\u0438\u043c\u0435\u043d\u0438\u044f)"}},
+{ico:"🔁", title:"\u041d\u0435 \u0437\u043d\u0430\u0435\u0448\u044c \u0432\u0438\u0434 \u0433\u043b\u0430\u0433\u043e\u043b\u0430? \u0421\u043f\u0440\u043e\u0441\u0438: \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442 \u043d\u0443\u0436\u0435\u043d?", text:"\u0415\u0441\u043b\u0438 \u0432\u0430\u0436\u0435\u043d \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442/\u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u0438\u0435 — \u0421\u0412 (z-, na-, po-, \u043f\u0440\u043e\u0447\u0438\u0435 \u043f\u0440\u0438\u0441\u0442\u0430\u0432\u043a\u0438). \u0415\u0441\u043b\u0438 \u043f\u0440\u043e\u0446\u0435\u0441\u0441/\u043f\u0440\u0438\u0432\u044b\u0447\u043a\u0430 — \u041d\u0421\u0412.", ex:{pl:"Robię kawę każdego ranka (\u041d\u0421\u0412 — \u043f\u0440\u0438\u0432\u044b\u0447\u043a\u0430)", tr:"Zrobiłem kawę (\u0421\u0412 — \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442, \u043a\u043e\u0444\u0435 \u0433\u043e\u0442\u043e\u0432)"}},
+{ico:"🗣", title:"\u0423\u043d\u0438\u0432\u0435\u0440\u0441\u0430\u043b\u044c\u043d\u044b\u0435 \u0437\u0430\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u0438 \u0440\u0435\u0447\u0438", text:"\u0415\u0441\u043b\u0438 \u043d\u0443\u0436\u043d\u043e \u0432\u0440\u0435\u043c\u044f \u043f\u043e\u0434\u0443\u043c\u0430\u0442\u044c, \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0439 \u043f\u043e\u043b\u044c\u0441\u043a\u0438\u0435 «\u0437\u0430\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u0438» — \u043e\u043d\u0438 \u0437\u0432\u0443\u0447\u0430\u0442 \u0435\u0441\u0442\u0435\u0441\u0442\u0432\u0435\u043d\u043d\u043e.", ex:{pl:"No więc... / Znaczy... / Jakby... / No właśnie...", tr:"\u041d\u0443 \u0432\u043e\u0442... / \u0422\u043e \u0435\u0441\u0442\u044c... / \u041a\u0430\u043a \u0431\u044b... / \u0412\u043e\u0442 \u0438\u043c\u0435\u043d\u043d\u043e..."}},
+{ico:"🎯", title:"\u041a\u043e\u043d\u0441\u0442\u0440\u0443\u043a\u0446\u0438\u044f «da się» \u0432\u043c\u0435\u0441\u0442\u043e «\u043c\u043e\u0436\u043d\u043e»", text:"«Da się» (\u0431\u0443\u043a\u0432\u0430\u043b\u044c\u043d\u043e «\u0434\u0430\u0451\u0442\u0441\u044f») — \u0443\u043d\u0438\u0432\u0435\u0440\u0441\u0430\u043b\u044c\u043d\u0430\u044f \u0437\u0430\u043c\u0435\u043d\u0430 «można», \u0437\u0432\u0443\u0447\u0438\u0442 \u043e\u0447\u0435\u043d\u044c \u043f\u043e-\u043f\u043e\u043b\u044c\u0441\u043a\u0438.", ex:{pl:"Da się to zrobić. / Nie da się.", tr:"\u042d\u0442\u043e \u043c\u043e\u0436\u043d\u043e \u0441\u0434\u0435\u043b\u0430\u0442\u044c. / \u041d\u0435\u0432\u043e\u0437\u043c\u043e\u0436\u043d\u043e."}},
+{ico:"📐", title:"Zabrakło mi vs. nie mam", text:"«Zabrakło mi» — «\u0443 \u043c\u0435\u043d\u044f \u0437\u0430\u043a\u043e\u043d\u0447\u0438\u043b\u043e\u0441\u044c» — \u0437\u0432\u0443\u0447\u0438\u0442 \u0433\u043e\u0440\u0430\u0437\u0434\u043e \u0436\u0438\u0432\u0435\u0435 \u0447\u0435\u043c «nie mam już». \u0418\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0439 \u0434\u043b\u044f \u0435\u0441\u0442\u0435\u0441\u0442\u0432\u0435\u043d\u043d\u043e\u0441\u0442\u0438.", ex:{pl:"Zabrakło mi słów. / Zabrakło mi czasu.", tr:"\u0423 \u043c\u0435\u043d\u044f \u0437\u0430\u043a\u043e\u043d\u0447\u0438\u043b\u0438\u0441\u044c \u0441\u043b\u043e\u0432\u0430. / \u0423 \u043c\u0435\u043d\u044f \u043d\u0435 \u0445\u0432\u0430\u0442\u0438\u043b\u043e \u0432\u0440\u0435\u043c\u0435\u043d\u0438."}},
+{ico:"🧩", title:"\u0423\u043c\u0435\u043d\u044c\u0448\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0435 \u0444\u043e\u0440\u043c\u044b — \u043a\u043b\u044e\u0447 \u043a \u0441\u0435\u0440\u0434\u0446\u0443!", text:"\u041f\u043e\u043b\u044f\u043a\u0438 \u041e\u0427\u0415\u041d\u042c \u0447\u0430\u0441\u0442\u043e \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u044e\u0442 \u0443\u043c\u0435\u043d\u044c\u0448\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0435 \u0444\u043e\u0440\u043c\u044b \u0432 \u0440\u0430\u0437\u0433\u043e\u0432\u043e\u0440\u0435. \u042d\u0442\u043e \u0434\u0435\u043b\u0430\u0435\u0442 \u0440\u0435\u0447\u044c \u0442\u0435\u043f\u043b\u0435\u0435 \u0438 \u0435\u0441\u0442\u0435\u0441\u0442\u0432\u0435\u043d\u043d\u0435\u0435.", ex:{pl:"kawa → kawka, mama → mamusia, chwila → chwilka", tr:"«Poczekaj chwilkę» \u0437\u0432\u0443\u0447\u0438\u0442 \u0433\u043e\u0440\u0430\u0437\u0434\u043e \u043c\u044f\u0433\u0447\u0435, \u0447\u0435\u043c «chwilę»"}},
+{ico:"🔃", title:"«Się robi» \u0432\u043c\u0435\u0441\u0442\u043e \u043f\u0430\u0441\u0441\u0438\u0432\u0430", text:"\u041f\u043e\u043b\u044c\u0441\u043a\u0438\u0439 \u0438\u0437\u0431\u0435\u0433\u0430\u0435\u0442 \u043f\u0430\u0441\u0441\u0438\u0432\u043d\u043e\u0433\u043e \u0437\u0430\u043b\u043e\u0433\u0430. \u0412\u043c\u0435\u0441\u0442\u043e \u043d\u0435\u0433\u043e \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0439 «się + 3\u043b. \u0435\u0434.\u0447.»", ex:{pl:"Tu się mówi po polsku. / To się nie robi.", tr:"\u0417\u0434\u0435\u0441\u044c \u0433\u043e\u0432\u043e\u0440\u044f\u0442 \u043f\u043e-\u043f\u043e\u043b\u044c\u0441\u043a\u0438. / \u0422\u0430\u043a \u043d\u0435 \u0434\u0435\u043b\u0430\u0435\u0442\u0441\u044f."}},
+{ico:"💪", title:"Empfatyczne «że»: \u0443\u0441\u0438\u043b\u0438\u0442\u0435\u043b\u044c", text:"\u0412\u0441\u0442\u0430\u0432\u044c «że» \u043f\u043e\u0441\u043b\u0435 \u0433\u043b\u0430\u0433\u043e\u043b\u0430 \u0434\u043b\u044f \u044d\u043c\u0444\u0430\u0437\u044b — \u0437\u0432\u0443\u0447\u0438\u0442 \u043e\u0447\u0435\u043d\u044c \u0436\u0438\u0432\u043e.", ex:{pl:"No że co? / Powiedz że nie! / Że niby dlaczego?", tr:"\u041d\u0443 \u0438 \u0447\u0442\u043e? / \u0421\u043a\u0430\u0436\u0438 \u0447\u0442\u043e \u043d\u0435\u0442! / \u0422\u0438\u043f\u0430 \u043f\u043e\u0447\u0435\u043c\u0443?"}},
+{ico:"🤝", title:"\u0417\u0430\u0431\u044b\u043b \u0441\u043b\u043e\u0432\u043e — \u0441\u043f\u0440\u043e\u0441\u0438 \u043f\u043e-\u043f\u043e\u043b\u044c\u0441\u043a\u0438", text:"\u041b\u0443\u0447\u0448\u0430\u044f \u0441\u0442\u0440\u0430\u0442\u0435\u0433\u0438\u044f: \u0441\u043f\u0440\u043e\u0441\u0438 \u043d\u043e\u0441\u0438\u0442\u0435\u043b\u044f. \u042d\u0442\u043e \u0438 \u0443\u043f\u0440\u0430\u0436\u043d\u0435\u043d\u0438\u0435, \u0438 \u0441\u043b\u043e\u0432\u0430\u0440\u044c \u0432 \u0440\u0435\u0430\u043b\u044c\u043d\u043e\u043c \u0432\u0440\u0435\u043c\u0435\u043d\u0438.", ex:{pl:"Jak się to mówi po polsku? / Jak się nazywa coś, co...", tr:"\u041a\u0430\u043a \u044d\u0442\u043e \u0431\u0443\u0434\u0435\u0442 \u043f\u043e-\u043f\u043e\u043b\u044c\u0441\u043a\u0438? / \u041a\u0430\u043a \u043d\u0430\u0437\u044b\u0432\u0430\u0435\u0442\u0441\u044f \u0442\u043e, \u0447\u0442\u043e..."}},
+{ico:"🎭", title:"\u0427\u0430\u0441\u0442\u0438\u0446\u0430 «no» — \u0432\u0441\u0451 \u0438 \u043d\u0438\u0447\u0435\u0433\u043e", text:"«No» — \u0441\u0430\u043c\u0430\u044f \u0443\u043d\u0438\u0432\u0435\u0440\u0441\u0430\u043b\u044c\u043d\u0430\u044f \u0447\u0430\u0441\u0442\u0438\u0446\u0430 \u043f\u043e\u043b\u044c\u0441\u043a\u043e\u0433\u043e \u044f\u0437\u044b\u043a\u0430. \u0417\u043d\u0430\u0447\u0435\u043d\u0438\u0435 \u043e\u043f\u0440\u0435\u0434\u0435\u043b\u044f\u0435\u0442 \u0438\u043d\u0442\u043e\u043d\u0430\u0446\u0438\u044f.", ex:{pl:"No tak (\u043d\u0443 \u0434\u0430) / No nie (\u043d\u0443 \u043d\u0435\u0442) / No i co? (\u043d\u0443 \u0438 \u0447\u0442\u043e?) / No właśnie! (\u0438\u043c\u0435\u043d\u043d\u043e!)", tr:"\u0412\u044b\u0443\u0447\u0438 \u0432\u0441\u0435 \u0438\u043d\u0442\u043e\u043d\u0430\u0446\u0438\u0438 — \u044d\u0442\u043e \u0441\u0440\u0430\u0437\u0443 \u0432\u044b\u0434\u0430\u0451\u0442 \u0443\u0440\u043e\u0432\u0435\u043d\u044c \u0432\u043b\u0430\u0434\u0435\u043d\u0438\u044f \u044f\u0437\u044b\u043a\u043e\u043c"}},
+{ico:"📝", title:"\u0422\u0440\u0443\u0434\u043d\u044b\u0435 \u043e\u043a\u043e\u043d\u0447\u0430\u043d\u0438\u044f? \u0417\u0430\u043c\u0435\u043d\u0438 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u043c", text:"\u041d\u0435 \u0443\u0432\u0435\u0440\u0435\u043d \u0432 \u043f\u0430\u0434\u0435\u0436\u0435 \u043f\u0440\u0438\u043b\u0430\u0433\u0430\u0442\u0435\u043b\u044c\u043d\u043e\u0433\u043e? \u041f\u0435\u0440\u0435\u0444\u0440\u0430\u0437\u0438\u0440\u0443\u0439 \u0447\u0435\u0440\u0435\u0437 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0438\u0442\u0435\u043b\u044c\u043d\u043e\u0435 \u0438\u043b\u0438 \u0443\u043f\u0440\u043e\u0441\u0442\u0438 \u043a\u043e\u043d\u0441\u0442\u0440\u0443\u043a\u0446\u0438\u044e.", ex:{pl:"\u0412\u043c\u0435\u0441\u0442\u043e: w tym ciekawym miejscu / \u0421\u043a\u0430\u0436\u0438: w miejscu, które jest ciekawe", tr:"\u0412 \u0438\u043d\u0442\u0435\u0440\u0435\u0441\u043d\u043e\u043c \u043c\u0435\u0441\u0442\u0435 → \u0432 \u043c\u0435\u0441\u0442\u0435, \u043a\u043e\u0442\u043e\u0440\u043e\u0435 \u0438\u043d\u0442\u0435\u0440\u0435\u0441\u043d\u043e\u0435"}},
+{ico:"🔑", title:"«Coś w rodzaju» — \u0441\u043f\u0430\u0441\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0439 \u043a\u0440\u0443\u0433", text:"\u0415\u0441\u043b\u0438 \u043d\u0435 \u0437\u043d\u0430\u0435\u0448\u044c \u0442\u043e\u0447\u043d\u043e\u0433\u043e \u0442\u0435\u0440\u043c\u0438\u043d\u0430, \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0439 «coś w rodzaju» (\u0447\u0442\u043e-\u0442\u043e \u0432\u0440\u043e\u0434\u0435) \u0438\u043b\u0438 «jakiś rodzaj» (\u043a\u0430\u043a\u043e\u0439-\u0442\u043e \u0432\u0438\u0434).", ex:{pl:"To jest coś w rodzaju raportu.", tr:"\u042d\u0442\u043e \u0447\u0442\u043e-\u0442\u043e \u0432\u0440\u043e\u0434\u0435 \u0434\u043e\u043a\u043b\u0430\u0434\u0430."}},
+{ico:"⚡", title:"\u041c\u043e\u0434\u0430\u043b\u044c\u043d\u044b\u0435 \u0433\u043b\u0430\u0433\u043e\u043b\u044b \u0443\u043f\u0440\u043e\u0449\u0430\u044e\u0442 \u0436\u0438\u0437\u043d\u044c", text:"Móc (\u043c\u043e\u0447\u044c), musieć (\u0434\u043e\u043b\u0436\u0435\u043d), chcieć (\u0445\u043e\u0442\u0435\u0442\u044c), wolieć (\u043f\u0440\u0435\u0434\u043f\u043e\u0447\u0438\u0442\u0430\u0442\u044c) + \u0438\u043d\u0444\u0438\u043d\u0438\u0442\u0438\u0432 — \u0438 \u0433\u0440\u0430\u043c\u043c\u0430\u0442\u0438\u043a\u0430 \u0430\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438 \u0443\u043f\u0440\u043e\u0449\u0430\u0435\u0442\u0441\u044f.", ex:{pl:"Chcę pójść. Muszę to zrobić. Mogę pomóc?", tr:"\u0425\u043e\u0447\u0443 \u043f\u043e\u0439\u0442\u0438. \u0414\u043e\u043b\u0436\u0435\u043d \u044d\u0442\u043e \u0441\u0434\u0435\u043b\u0430\u0442\u044c. \u041c\u043e\u0433\u0443 \u043f\u043e\u043c\u043e\u0447\u044c?"}},
+];
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let currentPage = 1;
+const PAGE_SIZE = 20;
+let drillQueue = [];
+let drillIndex = 0;
+let drillOk = 0, drillFail = 0;
+let cardFlipped = false;
+let quizData = [];
+let quizIndex = 0;
+let quizCorrect = 0;
+let quizAnswered = false;
+let xp = 0, streak = 0;
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('totalWords').textContent = VOCAB.length;
+  renderVocab();
+  initDrill();
+  startQuiz();
+  renderRules();
+  renderHacks();
+  renderSlang();
+});
+
+// ══════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ══════════════════════════════════════════
+// VOCAB
+// ══════════════════════════════════════════
+function getFiltered() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const cat = document.getElementById('catFilter').value;
+  const lvl = document.getElementById('lvlFilter').value;
+  return VOCAB.filter(([pl,ru,c,l]) => {
+    const matchQ = !q || pl.toLowerCase().includes(q) || ru.toLowerCase().includes(q);
+    const matchC = !cat || c === cat;
+    const matchL = !lvl || l === lvl;
+    return matchQ && matchC && matchL;
+  });
+}
+
+function renderVocab() {
+  currentPage = 1;
+  displayVocabPage();
+}
+
+function displayVocabPage() {
+  const data = getFiltered();
+  const total = data.length;
+  const pages = Math.ceil(total / PAGE_SIZE);
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const slice = data.slice(start, start + PAGE_SIZE);
+
+  const grid = document.getElementById('vocabGrid');
+  grid.innerHTML = slice.map(([pl,ru,cat,lvl]) => `
+    <div class="vocab-row">
+      <div class="pl">${pl}</div>
+      <div class="ru">${ru}</div>
+      <div class="cat">${cat}</div>
+      <div class="lvl ${lvl === 'slang' ? 'lvl-slang' : lvl === 'C1' ? 'lvl-c1' : 'lvl-b2'}">${lvl === 'slang' ? '\u0421\u041b' : lvl}</div>
+    </div>`).join('');
+
+  // pagination
+  const pg = document.getElementById('pagination');
+  if (pages <= 1) { pg.innerHTML = `<span>${total} \u0441\u043b\u043e\u0432</span>`; return; }
+  let html = `<span>${total} \u0441\u043b\u043e\u0432</span> `;
+  if (currentPage > 1) html += `<button onclick="goPage(${currentPage-1})">‹</button>`;
+  for (let i = Math.max(1,currentPage-2); i <= Math.min(pages,currentPage+2); i++) {
+    html += `<button class="${i===currentPage?'cur':''}" onclick="goPage(${i})">${i}</button>`;
+  }
+  if (currentPage < pages) html += `<button onclick="goPage(${currentPage+1})">›</button>`;
+  pg.innerHTML = html;
+}
+
+function goPage(p) { currentPage = p; displayVocabPage(); }
+
+// ══════════════════════════════════════════
+// DRILL
+// ══════════════════════════════════════════
+function initDrill() {
+  const cat = document.getElementById('drillCat').value;
+  const lvl = document.getElementById('drillLvl').value;
+  let pool = VOCAB.filter(([pl,ru,c,l]) => {
+    return (!cat || c === cat) && (!lvl || l === lvl);
+  });
+  shuffle(pool);
+  drillQueue = pool;
+  drillIndex = 0; drillOk = 0; drillFail = 0;
+  cardFlipped = false;
+  document.getElementById('flashcard').classList.remove('flipped');
+  showDrillCard();
+}
+
+function showDrillCard() {
+  if (drillIndex >= drillQueue.length) {
+    document.getElementById('fc_pl').textContent = '🎉 \u0413\u043e\u0442\u043e\u0432\u043e!';
+    document.getElementById('fc_tag').textContent = `\u0420\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442: ${drillOk}/${drillQueue.length}`;
+    document.getElementById('fc_ru').textContent = `\u0417\u043d\u0430\u0435\u0448\u044c: ${drillOk}, \u043f\u043e\u0432\u0442\u043e\u0440\u0438: ${drillFail}`;
+    document.getElementById('fc_example').textContent = '';
+    updateDrillStats();
+    return;
+  }
+  const [pl, ru, cat, lvl] = drillQueue[drillIndex];
+  document.getElementById('fc_pl').textContent = pl;
+  document.getElementById('fc_ru').textContent = ru;
+  document.getElementById('fc_tag').textContent = `${cat} · ${lvl === 'slang' ? '\u0441\u043b\u0435\u043d\u0433' : lvl}`;
+  document.getElementById('fc_tag2').textContent = `${cat} · ${lvl === 'slang' ? '\u0441\u043b\u0435\u043d\u0433' : lvl}`;
+  document.getElementById('fc_example').textContent = EXAMPLES[pl] || '';
+  updateDrillStats();
+}
+
+function flipCard() {
+  cardFlipped = !cardFlipped;
+  document.getElementById('flashcard').classList.toggle('flipped', cardFlipped);
+}
+
+function rateCard(knew) {
+  if (knew) { drillOk++; addXP(5); } else { drillFail++; drillQueue.push(drillQueue[drillIndex]); }
+  drillIndex++;
+  cardFlipped = false;
+  document.getElementById('flashcard').classList.remove('flipped');
+  showDrillCard();
+}
+
+function updateDrillStats() {
+  document.getElementById('drillOk').textContent = drillOk;
+  document.getElementById('drillFail').textContent = drillFail;
+  document.getElementById('drillLeft').textContent = Math.max(0, drillQueue.length - drillIndex);
+  const pct = drillQueue.length ? Math.round(drillIndex / drillQueue.length * 100) : 0;
+  document.getElementById('drillProgress').style.width = pct + '%';
+}
+
+// ══════════════════════════════════════════
+// QUIZ
+// ══════════════════════════════════════════
+function startQuiz() {
+  quizData = [];
+  let pool = [...VOCAB].filter(w => w[3] !== 'slang');
+  shuffle(pool);
+  quizData = pool.slice(0, 20);
+  quizIndex = 0; quizCorrect = 0; quizAnswered = false;
+  document.getElementById('quizScore').style.display = 'none';
+  document.getElementById('quizRestartBtn').style.display = 'none';
+  showQuizQuestion();
+}
+
+function showQuizQuestion() {
+  if (quizIndex >= quizData.length) {
+    document.getElementById('quizQ').textContent = '';
+    document.getElementById('quizOpts').innerHTML = '';
+    document.getElementById('quizMeta').textContent = '\u0422\u0435\u0441\u0442 \u0437\u0430\u0432\u0435\u0440\u0448\u0451\u043d!';
+    document.getElementById('quizProgress').style.width = '100%';
+    const pct = Math.round(quizCorrect / quizData.length * 100);
+    document.getElementById('quizScore').style.display = 'block';
+    document.getElementById('quizScore').innerHTML = `
+      <div style="font-size:2.5rem">${pct >= 80 ? '🏆' : pct >= 60 ? '👍' : '📚'}</div>
+      <div>\u0420\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442: <span style="color:var(--accent)">${quizCorrect}</span> / ${quizData.length}</div>
+      <div style="font-size:.85rem;color:var(--muted);margin-top:4px">${pct}% \u043f\u0440\u0430\u0432\u0438\u043b\u044c\u043d\u043e</div>`;
+    document.getElementById('quizRestartBtn').style.display = 'inline-block';
+    addXP(quizCorrect * 10);
+    return;
+  }
+  quizAnswered = false;
+  const [pl, ru] = quizData[quizIndex];
+  document.getElementById('quizQ').textContent = pl;
+  document.getElementById('quizMeta').textContent = `\u0412\u043e\u043f\u0440\u043e\u0441 ${quizIndex + 1} \u0438\u0437 ${quizData.length} · ✅ ${quizCorrect}`;
+  document.getElementById('quizProgress').style.width = ((quizIndex+1)/quizData.length*100) + '%';
+
+  // 4 варианта
+  let wrongs = VOCAB.filter(w => w[1] !== ru).map(w => w[1]);
+  shuffle(wrongs);
+  const opts = [ru, ...wrongs.slice(0, 3)];
+  shuffle(opts);
+
+  document.getElementById('quizOpts').innerHTML = opts.map(o => `
+    <div class="quiz-opt" onclick="answerQuiz('${escapeSingle(o)}','${escapeSingle(ru)}')">${o}</div>`).join('');
+}
+
+function escapeSingle(s) { return s.replace(/'/g, "\\'"); }
+
+function answerQuiz(chosen, correct) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const opts = document.querySelectorAll('.quiz-opt');
+  opts.forEach(o => {
+    if (o.textContent === correct) o.classList.add('correct');
+    else if (o.textContent === chosen && chosen !== correct) o.classList.add('wrong');
+  });
+  if (chosen === correct) { quizCorrect++; streak++; addXP(10); } else { streak = 0; }
+  document.getElementById('streak').textContent = streak;
+  setTimeout(() => { quizIndex++; showQuizQuestion(); }, 1200);
+}
+
+// ══════════════════════════════════════════
+// RULES
+// ══════════════════════════════════════════
+function renderRules() {
+  document.getElementById('rulesContainer').innerHTML = RULES.map((r, i) => `
+    <div class="rule-item">
+      <div class="rule-head" onclick="toggleRule(${i})" id="rh${i}">
+        <span>${r.title}</span>
+        <span class="arrow">▼</span>
+      </div>
+      <div class="rule-body" id="rb${i}">${r.content}</div>
+    </div>`).join('');
+}
+
+function toggleRule(i) {
+  const head = document.getElementById(`rh${i}`);
+  const body = document.getElementById(`rb${i}`);
+  head.classList.toggle('open');
+  body.classList.toggle('show');
+}
+
+// ══════════════════════════════════════════
+// HACKS
+// ══════════════════════════════════════════
+function renderHacks() {
+  document.getElementById('hacksList').innerHTML = HACKS.map(h => `
+    <div class="hack">
+      <div class="hack-ico">${h.ico}</div>
+      <div>
+        <div class="hack-title">${h.title}</div>
+        <div class="hack-text">${h.text}</div>
+        <div class="hack-example"><div class="pl">${h.ex.pl}</div><div class="tr">${h.ex.tr}</div></div>
+      </div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════
+// SLANG
+// ══════════════════════════════════════════
+function renderSlang() {
+  const slangWords = VOCAB.filter(w => w[3] === 'slang');
+  document.getElementById('slangGrid').innerHTML = `
+    <div class="vocab-header">
+      <span>\u041f\u043e\u043b\u044c\u0441\u043a\u0438\u0439</span><span>\u0420\u0443\u0441\u0441\u043a\u0438\u0439</span><span>\u0422\u0435\u043c\u0430</span><span>\u0421\u0442\u0438\u043b\u044c</span>
+    </div>` +
+    slangWords.map(([pl,ru,cat]) => `
+    <div class="vocab-row">
+      <div class="pl">${pl}</div>
+      <div class="ru">${ru}</div>
+      <div class="cat">${cat}</div>
+      <div class="lvl lvl-slang">\u0421\u041b</div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════
+// XP
+// ══════════════════════════════════════════
+function addXP(n) {
+  xp += n;
+  document.getElementById('xpVal').textContent = xp;
+}
+
+// ══════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+</script>
+</body>
+</html>
