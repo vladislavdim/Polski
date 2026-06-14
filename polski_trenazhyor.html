@@ -2881,20 +2881,11 @@ function renderCheat(){
 
 function addXP(n){xp+=n;document.getElementById('xpVal').textContent=xp;}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
-</script>
 <script>
- var supabase = window.supabase.createClient(
+  const supabase = window.supabase.createClient(
     'https://qwxpkqianfmmkfkborte.supabase.co',
     'sb_publishable_JrhMTIZA0ZYje7EglqT3sg_nfbwwc7o'
   )
-
-  supabase.auth.onAuthStateChange((event, session) => {
-    if (session) {
-      checkAccess()
-    } else {
-      showAuthScreen()
-    }
-  })
 
   async function checkAccess() {
     const { data: { user } } = await supabase.auth.getUser()
@@ -2922,17 +2913,16 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random
   }
 
   function showAuthScreen() {
-    const overlay = document.createElement('div')
-    overlay.id = 'auth-overlay'
-    overlay.style = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-family:sans-serif;z-index:9999'
-    overlay.innerHTML = `
-      <h2 style="color:#fff">🇵🇱 Polski B2/C1</h2>
-      <input id="email" type="email" placeholder="Email" style="padding:10px;width:280px;border-radius:8px;border:1px solid #ccc"/>
-      <input id="pass" type="password" placeholder="Пароль" style="padding:10px;width:280px;border-radius:8px;border:1px solid #ccc"/>
-      <button onclick="signUp()" style="padding:10px 24px;background:#6366f1;color:#fff;border:none;border-radius:8px;cursor:pointer">Зарегистрироваться</button>
-      <button onclick="signIn()" style="padding:10px 24px;background:#fff;border:1px solid #6366f1;border-radius:8px;cursor:pointer">Войти</button>`
-    document.body.appendChild(overlay)
-}
+    document.body.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px;font-family:sans-serif">
+        <h2>🇵🇱 Polski B2/C1</h2>
+        <input id="email" type="email" placeholder="Email" style="padding:10px;width:280px;border-radius:8px;border:1px solid #ccc"/>
+        <input id="pass" type="password" placeholder="Пароль" style="padding:10px;width:280px;border-radius:8px;border:1px solid #ccc"/>
+        <button onclick="signUp()" style="padding:10px 24px;background:#6366f1;color:#fff;border:none;border-radius:8px;cursor:pointer">Зарегистрироваться</button>
+        <button onclick="signIn()" style="padding:10px 24px;background:#fff;border:1px solid #6366f1;border-radius:8px;cursor:pointer">Войти</button>
+      </div>`
+  }
+
   async function signUp() {
     const email = document.getElementById('email').value
     const pass = document.getElementById('pass').value
@@ -2957,18 +2947,18 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random
     }, 10000)
   }
 
- function showPaywall() {
-    const overlay = document.createElement('div')
-    overlay.style = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-family:sans-serif;z-index:9999'
-    overlay.innerHTML = `
-      <h2 style="color:#fff">Пробный период закончился</h2>
-      <p style="color:#ccc">Оформите подписку для продолжения</p>
-      <button style="padding:12px 32px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer">Оплатить доступ</button>`
-    document.body.appendChild(overlay)
-}
+  function showPaywall() {
+    document.body.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px;font-family:sans-serif">
+        <h2>Пробный период закончился</h2>
+        <p>Оформите подписку для продолжения</p>
+        <button style="padding:12px 32px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer">Оплатить доступ</button>
+      </div>`
+  }
 
-function fullAccess() { console.log('Полный доступ') }
-  setTimeout(() => checkAccess(), 500)
+  function fullAccess() { console.log('Полный доступ') }
+
+  checkAccess()
 </script>
 </body>
 </html>
