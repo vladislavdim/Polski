@@ -2883,10 +2883,16 @@ function addXP(n){xp+=n;document.getElementById('xpVal').textContent=xp;}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
 </script>
 <script>
-  var supabase = window.supabase.createClient(
+ var supabase = window.supabase.createClient(
     'https://qwxpkqianfmmkfkborte.supabase.co',
     'sb_publishable_JrhMTIZA0ZYje7EglqT3sg_nfbwwc7o'
   )
+
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+      checkAccess()
+    }
+  })
 
   async function checkAccess() {
     const { data: { user } } = await supabase.auth.getUser()
