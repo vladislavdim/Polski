@@ -2939,26 +2939,8 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random
     else checkAccess()
   }
 
-  function startTrial(trialEndsAt) {
-    if (!trialEndsAt) return
-    const interval = setInterval(() => {
-      const left = new Date(trialEndsAt) - new Date()
-      if (left <= 0) { clearInterval(interval); showPaywall() }
-    }, 10000)
-  }
-
-  function showPaywall() {
-    document.body.innerHTML = `
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px;font-family:sans-serif">
-        <h2>Пробный период закончился</h2>
-        <p>Оформите подписку для продолжения</p>
-        <button style="padding:12px 32px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer">Оплатить доступ</button>
-      </div>`
-  }
-
-  function fullAccess() { console.log('Полный доступ') }
-
-  checkAccess()
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="auth.js"></script>
 </body>
 </html>
