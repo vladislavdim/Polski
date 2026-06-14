@@ -2881,66 +2881,7 @@ function renderCheat(){
 
 function addXP(n){xp+=n;document.getElementById('xpVal').textContent=xp;}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
-<script>
-  const supabase = window.supabase.createClient(
-    'https://qwxpkqianfmmkfkborte.supabase.co',
-    'sb_publishable_JrhMTIZA0ZYje7EglqT3sg_nfbwwc7o'
-  )
-
-  async function checkAccess() {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      showAuthScreen()
-      return
-    }
-
-    const { data } = await supabase
-      .from('user_access')
-      .select('*')
-      .eq('user_id', user.id)
-      .single()
-
-    if (!data) {
-      await supabase.from('user_access').insert({ user_id: user.id })
-      startTrial()
-      return
-    }
-
-    if (data.paid) { fullAccess(); return }
-    if (new Date() < new Date(data.trial_ends_at)) { startTrial(data.trial_ends_at); return }
-
-    showPaywall()
-  }
-
-  function showAuthScreen() {
-    document.body.innerHTML = `
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px;font-family:sans-serif">
-        <h2>🇵🇱 Polski B2/C1</h2>
-        <input id="email" type="email" placeholder="Email" style="padding:10px;width:280px;border-radius:8px;border:1px solid #ccc"/>
-        <input id="pass" type="password" placeholder="Пароль" style="padding:10px;width:280px;border-radius:8px;border:1px solid #ccc"/>
-        <button onclick="signUp()" style="padding:10px 24px;background:#6366f1;color:#fff;border:none;border-radius:8px;cursor:pointer">Зарегистрироваться</button>
-        <button onclick="signIn()" style="padding:10px 24px;background:#fff;border:1px solid #6366f1;border-radius:8px;cursor:pointer">Войти</button>
-      </div>`
-  }
-
-  async function signUp() {
-    const email = document.getElementById('email').value
-    const pass = document.getElementById('pass').value
-    const { error } = await supabase.auth.signUp({ email, password: pass })
-    if (error) alert(error.message)
-    else alert('Проверьте почту для подтверждения!')
-  }
-
-  async function signIn() {
-    const email = document.getElementById('email').value
-    const pass = document.getElementById('pass').value
-    const { error } = await supabase.auth.signInWithPassword({ email, password: pass })
-    if (error) alert(error.message)
-    else checkAccess()
-  }
-
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="auth.js"></script>
 </body>
 </html>
