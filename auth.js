@@ -90,4 +90,10 @@ function fullAccess() {
   console.log('Полный доступ')
 }
 
-setTimeout(() => checkAccess(), 500)
+supabase.auth.getSession().then(({ data: { session } }) => {
+  if (session) {
+    checkAccess()
+  } else {
+    showAuthScreen()
+  }
+})
